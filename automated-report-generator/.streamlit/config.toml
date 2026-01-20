@@ -1,0 +1,64 @@
+# Streamlit Configuration for Automated Report Generator
+# Professional theme with modern styling
+
+[theme]
+# Primary color (used for buttons, links, and interactive elements)
+primaryColor = "#2563eb"
+
+# Background color for main content area
+backgroundColor = "#f9fafb"
+
+# Background color for sidebar and secondary areas
+secondaryBackgroundColor = "#ffffff"
+
+# Text color
+textColor = "#1f2937"
+
+# Font family
+font = "sans-serif"
+
+[server]
+# Run in headless mode (no browser auto-open)
+headless = true
+
+# Server address
+address = "0.0.0.0"
+
+# Default port
+port = 8501
+
+# Enable CORS
+enableCORS = false
+
+# Enable XSRF protection
+enableXsrfProtection = true
+
+# Max upload size (200 MB)
+maxUploadSize = 200
+
+[browser]
+# Disable usage stats collection
+gatherUsageStats = false
+
+# Server address for browser
+serverAddress = "localhost"
+
+# Server port for browser
+serverPort = 8501
+
+[client]
+# Hide sidebar navigation (using wizard instead)
+showSidebarNavigation = false
+
+# Show error details
+showErrorDetails = true
+
+# Enable caching
+caching = true
+
+[runner]
+# Magic commands disabled for cleaner execution
+magicEnabled = false
+
+# Fast rerun
+fastReruns = true

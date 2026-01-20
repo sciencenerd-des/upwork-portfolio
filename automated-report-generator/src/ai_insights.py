@@ -9,7 +9,8 @@ This module handles:
 """
 
 import os
-from typing import Any, Dict, List, Optional, Union
+import logging
+from typing import Any, Dict, List, Optional, Tuple, Union
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -21,6 +22,9 @@ from .utils import (
     get_trend_direction,
     calculate_percentage_change,
 )
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 class AIInsightsError(Exception):
@@ -36,17 +40,24 @@ class AIInsights:
     fallback to basic statistical analysis when API is unavailable.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    # Default model - can be overridden via OPENROUTER_MODEL env variable
+    DEFAULT_MODEL = "openai/gpt-4o-mini"
+
+    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         """
         Initialize the AIInsights generator.
 
         Args:
             api_key: OpenRouter API key. If not provided, will look for
                     OPENROUTER_API_KEY environment variable.
+            model: Model to use for AI insights. If not provided, will look for
+                   OPENROUTER_MODEL environment variable or use DEFAULT_MODEL.
         """
         self.api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
         self._client = None
-        self._model = "openai/gpt-5-nano"  # GPT-5 Nano via OpenRouter
+        self._model = model or os.environ.get("OPENROUTER_MODEL", self.DEFAULT_MODEL)
+        self._last_error: Optional[str] = None
+        self._fallback_used: bool = False
 
         if self.api_key:
             try:
@@ -55,15 +66,28 @@ class AIInsights:
                     base_url="https://openrouter.ai/api/v1",
                     api_key=self.api_key,
                 )
-            except ImportError:
-                pass  # Will use fallback
-            except Exception:
-                pass  # Will use fallback
+                logger.info(f"AI Insights initialized with model: {self._model}")
+            except ImportError as e:
+                logger.warning(f"OpenAI library not installed, will use fallback insights: {e}")
+            except Exception as e:
+                logger.warning(f"Failed to initialize OpenAI client, will use fallback insights: {e}")
+        else:
+            logger.info("No API key provided, AI insights will use fallback statistical analysis")
 
     @property
     def is_available(self) -> bool:
         """Check if AI insights are available."""
         return self._client is not None
+
+    @property
+    def fallback_used(self) -> bool:
+        """Check if fallback insights were used instead of AI."""
+        return self._fallback_used
+
+    @property
+    def last_error(self) -> Optional[str]:
+        """Get the last error message if AI failed."""
+        return self._last_error
 
     def generate_insights(
         self,
@@ -88,17 +112,35 @@ class AIInsights:
         Returns:
             List of insight strings
         """
+        # Reset state
+        self._fallback_used = False
+        self._last_error = None
+
         if use_ai and self.is_available:
             try:
-                return self._generate_ai_insights(
+                logger.info(f"Generating AI insights using model: {self._model}")
+                insights = self._generate_ai_insights(
                     data_summary, template_type, max_insights,
                     chart_descriptions, raw_data_context
                 )
+                logger.info(f"Successfully generated {len(insights)} AI insights")
+                return insights
             except Exception as e:
-                # Fallback to basic analysis on any error
-                pass
+                # Log the error and fallback to basic analysis
+                error_msg = str(e)
+                self._last_error = error_msg
+                self._fallback_used = True
+                logger.error(f"AI insight generation failed: {error_msg}. Falling back to statistical analysis.")
 
-        return self._generate_basic_insights(data_summary, template_type, max_insights)
+        # Fallback to basic insights
+        if use_ai and not self.is_available:
+            self._fallback_used = True
+            self._last_error = "AI service not available (no API key or client initialization failed)"
+            logger.warning("AI not available, using fallback statistical analysis")
+
+        insights = self._generate_basic_insights(data_summary, template_type, max_insights)
+        logger.info(f"Generated {len(insights)} fallback insights")
+        return insights
 
     def _generate_ai_insights(
         self,

@@ -1,0 +1,142 @@
+# Document Intelligence System Configuration
+# Version: 1.0
+
+app:
+  name: "Document Intelligence System"
+  version: "1.0.0"
+  debug: false
+  log_level: "INFO"
+
+# Document Processing Settings
+document:
+  max_file_size_mb: 25
+  max_pages: 50
+  supported_formats:
+    - ".pdf"
+    - ".png"
+    - ".jpg"
+    - ".jpeg"
+    - ".tiff"
+    - ".tif"
+  temp_dir: "/tmp/doc-intelligence"
+
+# OCR Settings
+ocr:
+  engine: "tesseract"
+  language: "eng"
+  timeout_per_page_seconds: 30
+  dpi: 300
+  preprocessing:
+    enabled: true
+    deskew: true
+    denoise: true
+    enhance_contrast: true
+  confidence_threshold: 60  # Minimum OCR confidence (0-100)
+
+# Text Processing Settings
+text_processing:
+  chunk_size: 1000  # Characters per chunk
+  chunk_overlap: 200  # Overlap between chunks
+  min_chunk_size: 100  # Minimum chunk size
+  sentence_boundary_detection: true
+  normalize_whitespace: true
+  remove_artifacts: true
+
+# Entity Extraction Settings
+entity_extraction:
+  spacy_model: "en_core_web_sm"  # Use small model for speed, can upgrade to lg
+  confidence_threshold: 0.7
+  deduplicate: true
+  # Custom entity patterns
+  patterns:
+    invoice_number:
+      - 'Invoice\s*#?\s*:?\s*([A-Z0-9-]+)'
+      - 'Inv\s*No\.?\s*:?\s*([A-Z0-9-]+)'
+    date:
+      - '(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})'
+      - '(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})'
+      - '(\d{4}[-/]\d{2}[-/]\d{2})'
+    amount_inr:
+      - '₹\s*([\d,]+\.?\d*)'
+      - 'Rs\.?\s*([\d,]+\.?\d*)'
+      - 'INR\s*([\d,]+\.?\d*)'
+    amount_usd:
+      - '\$\s*([\d,]+\.?\d*)'
+      - 'USD\s*([\d,]+\.?\d*)'
+    amount_eur:
+      - '€\s*([\d,]+\.?\d*)'
+      - 'EUR\s*([\d,]+\.?\d*)'
+    gstin:
+      - '\b(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1})\b'
+    pan:
+      - '\b([A-Z]{5}\d{4}[A-Z]{1})\b'
+    email:
+      - '\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b'
+    phone:
+      - '\b(\+?[\d\s-]{10,15})\b'
+
+# Vector Store Settings
+vector_store:
+  provider: "chromadb"
+  collection_prefix: "doc_intelligence"
+  embedding_model: "text-embedding-3-small"  # OpenAI embedding via OpenRouter
+  embedding_dimension: 1536
+  top_k: 5  # Number of chunks to retrieve
+  relevance_threshold: 0.7
+
+# LLM Settings (via OpenRouter)
+llm:
+  provider: "openrouter"
+  base_url: "https://openrouter.ai/api/v1"
+  primary_model: "anthropic/claude-sonnet-4-20250514"
+  fallback_model: "openai/gpt-4o"
+  embedding_model: "openai/text-embedding-3-small"
+  max_tokens: 2048
+  temperature: 0.1
+  timeout_seconds: 60
+
+# Summarization Settings
+summarization:
+  max_summary_words: 200
+  min_key_points: 3
+  max_key_points: 7
+  include_document_type: true
+
+# Q&A Settings
+qa:
+  max_context_chunks: 5
+  max_conversation_history: 10
+  response_timeout_seconds: 30
+  include_citations: true
+  generate_followup_questions: true
+  no_answer_response: "I cannot find this information in the document."
+
+# Export Settings
+export:
+  json_indent: 2
+  csv_delimiter: ","
+  excel_sheet_names:
+    summary: "Summary"
+    entities: "Entities"
+    raw_text: "Raw Text"
+
+# Session/Document Store Settings
+session:
+  ttl_minutes: 60  # Time-to-live for documents in memory
+  cleanup_interval_seconds: 300  # How often to check for expired sessions
+  max_documents_per_session: 5
+
+# Performance Settings
+performance:
+  max_processing_time_seconds: 90
+  async_processing: true
+  progress_update_interval: 1  # Seconds between progress updates
+
+# API Settings
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins:
+    - "http://localhost:8501"
+    - "http://127.0.0.1:8501"
+  rate_limit_requests_per_minute: 60
