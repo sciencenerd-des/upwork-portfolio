@@ -1,0 +1,60 @@
+Product,Category,Quantity,Reorder_Level,Unit_Cost,Supplier,Location
+Laptop Pro 15,Electronics,45,20,850.00,TechSupply Inc,Warehouse A
+Laptop Pro 13,Electronics,32,15,750.00,TechSupply Inc,Warehouse A
+Desktop Workstation,Electronics,18,10,1200.00,TechSupply Inc,Warehouse A
+Monitor 27",Electronics,65,30,320.00,DisplayCo,Warehouse B
+Monitor 24",Electronics,42,25,240.00,DisplayCo,Warehouse B
+Monitor 32" 4K,Electronics,28,15,480.00,DisplayCo,Warehouse B
+Wireless Mouse,Electronics,150,50,25.00,PeripheralWorld,Warehouse C
+Wired Mouse,Electronics,85,40,15.00,PeripheralWorld,Warehouse C
+Keyboard Mechanical,Electronics,78,35,85.00,PeripheralWorld,Warehouse C
+Keyboard Standard,Electronics,95,40,35.00,PeripheralWorld,Warehouse C
+Webcam HD,Electronics,55,25,85.00,MediaTech,Warehouse C
+Webcam 4K,Electronics,22,10,165.00,MediaTech,Warehouse C
+Headset Pro,Electronics,48,20,125.00,AudioPlus,Warehouse C
+Earbuds Wireless,Electronics,120,50,45.00,AudioPlus,Warehouse C
+USB Hub 7-Port,Electronics,65,30,35.00,ConnectAll,Warehouse C
+USB-C Adapter,Electronics,90,40,25.00,ConnectAll,Warehouse C
+Office Chair Standard,Furniture,35,15,280.00,FurniturePro,Warehouse D
+Office Chair Executive,Furniture,18,8,450.00,FurniturePro,Warehouse D
+Office Chair Ergonomic,Furniture,12,10,580.00,FurniturePro,Warehouse D
+Standing Desk,Furniture,22,12,680.00,DeskMasters,Warehouse D
+Standard Desk,Furniture,28,15,320.00,DeskMasters,Warehouse D
+L-Shaped Desk,Furniture,8,5,520.00,DeskMasters,Warehouse D
+Desk Lamp LED,Furniture,85,40,38.00,LightingCo,Warehouse E
+Floor Lamp,Furniture,32,15,75.00,LightingCo,Warehouse E
+Filing Cabinet 3-Drawer,Furniture,25,12,185.00,StorageSolutions,Warehouse E
+Filing Cabinet 4-Drawer,Furniture,18,10,225.00,StorageSolutions,Warehouse E
+Bookshelf 5-Tier,Furniture,15,8,145.00,StorageSolutions,Warehouse E
+Whiteboard 4x3,Supplies,28,15,65.00,OfficeBasics,Warehouse F
+Whiteboard 6x4,Supplies,14,8,95.00,OfficeBasics,Warehouse F
+Paper A4 Ream,Supplies,250,100,8.50,PaperWorld,Warehouse F
+Paper Legal Ream,Supplies,85,50,9.50,PaperWorld,Warehouse F
+Printer Ink Black,Supplies,45,20,32.00,InkSupply,Warehouse F
+Printer Ink Color,Supplies,38,20,48.00,InkSupply,Warehouse F
+Stapler Heavy Duty,Supplies,55,25,18.00,OfficeBasics,Warehouse F
+Tape Dispenser,Supplies,65,30,12.00,OfficeBasics,Warehouse F
+Scissors Office,Supplies,48,25,8.00,OfficeBasics,Warehouse F
+Notebook A5,Supplies,180,80,4.50,PaperWorld,Warehouse F
+Notebook A4,Supplies,145,70,6.50,PaperWorld,Warehouse F
+Pen Pack 12,Supplies,220,100,5.50,WriteRight,Warehouse F
+Pencil Pack 12,Supplies,165,80,3.50,WriteRight,Warehouse F
+Highlighter Set,Supplies,95,50,7.50,WriteRight,Warehouse F
+Marker Set,Supplies,72,40,9.50,WriteRight,Warehouse F
+Folder Manila 100pk,Supplies,42,20,22.00,OfficeBasics,Warehouse F
+Binder 3-Ring,Supplies,88,40,8.00,OfficeBasics,Warehouse F
+Post-it Notes,Supplies,195,80,4.00,StickyBrand,Warehouse F
+Paper Clips Box,Supplies,125,60,2.50,OfficeBasics,Warehouse F
+Rubber Bands Box,Supplies,78,40,3.00,OfficeBasics,Warehouse F
+External SSD 1TB,Electronics,35,15,95.00,StorageTech,Warehouse A
+External HDD 2TB,Electronics,42,20,75.00,StorageTech,Warehouse A
+USB Flash Drive 64GB,Electronics,120,50,12.00,StorageTech,Warehouse C
+Power Strip 6-Outlet,Electronics,68,30,18.00,PowerSafe,Warehouse C
+Surge Protector,Electronics,45,25,35.00,PowerSafe,Warehouse C
+Extension Cord 10ft,Electronics,55,30,15.00,PowerSafe,Warehouse C
+Cable Management Kit,Electronics,38,20,22.00,CableOrg,Warehouse C
+Monitor Stand,Furniture,52,25,45.00,DeskMasters,Warehouse D
+Laptop Stand,Furniture,48,25,38.00,DeskMasters,Warehouse D
+Footrest Ergonomic,Furniture,22,12,55.00,ComfortPlus,Warehouse D
+Wrist Rest Keyboard,Electronics,65,30,18.00,ComfortPlus,Warehouse C
+Mouse Pad XL,Electronics,95,40,15.00,ComfortPlus,Warehouse C
