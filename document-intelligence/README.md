@@ -21,13 +21,38 @@ AI-powered document processing system with OCR, entity extraction, summarization
 
 ### Installation
 
+#### macOS
+
 ```bash
+# Install Tesseract OCR via Homebrew
+brew install tesseract tesseract-lang
+
 # Clone the repository
 cd document-intelligence
 
 # Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
+
+# Install dependencies (includes urllib3<2.0 for LibreSSL compatibility)
+pip install -r requirements.txt
+
+# Download spaCy model (optional, improves NER)
+python -m spacy download en_core_web_sm
+```
+
+#### Linux
+
+```bash
+# Install Tesseract OCR
+sudo apt-get install tesseract-ocr tesseract-ocr-eng
+
+# Clone the repository
+cd document-intelligence
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -35,6 +60,12 @@ pip install -r requirements.txt
 # Download spaCy model (optional, improves NER)
 python -m spacy download en_core_web_sm
 ```
+
+#### Windows
+
+1. Install [Tesseract OCR](https://github.com/UB-Mannheim/tesseract/wiki)
+2. Add Tesseract to system PATH
+3. Install Python dependencies as shown above
 
 ### Configuration
 
