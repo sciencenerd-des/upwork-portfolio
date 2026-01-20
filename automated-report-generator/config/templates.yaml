@@ -1,0 +1,182 @@
+# Template definitions for Automated Report Generator
+
+templates:
+  sales:
+    name: "Sales Report"
+    description: "Comprehensive sales analysis with revenue trends, product performance, and regional breakdown"
+    required_columns:
+      date:
+        aliases: ["Date", "Transaction_Date", "Order_Date", "date", "DATE", "sale_date", "SaleDate"]
+        type: "datetime"
+      product:
+        aliases: ["Product", "Item", "SKU", "product_name", "Product_Name", "ProductName", "item_name"]
+        type: "string"
+      quantity:
+        aliases: ["Quantity", "Qty", "Units", "quantity", "QTY", "units_sold", "UnitsSold"]
+        type: "numeric"
+      revenue:
+        aliases: ["Revenue", "Amount", "Sales", "Total", "revenue", "REVENUE", "total_amount", "TotalAmount"]
+        type: "numeric"
+    optional_columns:
+      region:
+        aliases: ["Region", "Area", "Territory", "Location", "region", "sales_region"]
+        type: "string"
+      category:
+        aliases: ["Category", "Type", "Group", "category", "product_category", "ProductCategory"]
+        type: "string"
+    sections:
+      - name: "Executive Summary"
+        type: "summary"
+        metrics: ["total_revenue", "total_units", "avg_order_value", "period"]
+      - name: "Revenue Trend"
+        type: "chart"
+        chart_type: "line"
+        x_column: "date"
+        y_column: "revenue"
+        aggregation: "sum"
+      - name: "Product Performance"
+        type: "chart"
+        chart_type: "bar"
+        group_by: "product"
+        metric: "revenue"
+        limit: 10
+      - name: "Regional Breakdown"
+        type: "chart"
+        chart_type: "pie"
+        group_by: "region"
+        metric: "revenue"
+        optional: true
+      - name: "Detailed Data Table"
+        type: "table"
+        sort_by: "revenue"
+        order: "descending"
+        limit: 20
+      - name: "AI Insights"
+        type: "insights"
+        optional: true
+
+  financial:
+    name: "Financial Summary"
+    description: "Financial overview with income vs expenses, category breakdown, and month-over-month analysis"
+    required_columns:
+      date:
+        aliases: ["Date", "Transaction_Date", "date", "DATE", "trans_date", "TransactionDate"]
+        type: "datetime"
+      category:
+        aliases: ["Category", "Type", "Expense_Type", "category", "expense_category", "IncomeType"]
+        type: "string"
+      amount:
+        aliases: ["Amount", "Value", "Total", "amount", "AMOUNT", "transaction_amount"]
+        type: "numeric"
+      transaction_type:
+        aliases: ["Type", "Transaction_Type", "trans_type", "IncomeExpense", "income_expense", "Flow"]
+        type: "string"
+        valid_values: ["Income", "Expense", "income", "expense", "INCOME", "EXPENSE"]
+    optional_columns:
+      description:
+        aliases: ["Description", "Notes", "Memo", "description", "note"]
+        type: "string"
+      account:
+        aliases: ["Account", "account_name", "AccountName", "bank_account"]
+        type: "string"
+    sections:
+      - name: "Financial Overview"
+        type: "summary"
+        metrics: ["total_income", "total_expenses", "net_profit", "profit_margin"]
+      - name: "Monthly Trend"
+        type: "chart"
+        chart_type: "line"
+        x_column: "date"
+        y_columns: ["income", "expenses"]
+        aggregation: "sum"
+        group_by_month: true
+      - name: "Expense Breakdown"
+        type: "chart"
+        chart_type: "pie"
+        filter: {"transaction_type": "Expense"}
+        group_by: "category"
+        metric: "amount"
+      - name: "Income Sources"
+        type: "chart"
+        chart_type: "bar"
+        filter: {"transaction_type": "Income"}
+        group_by: "category"
+        metric: "amount"
+      - name: "Month-over-Month Comparison"
+        type: "table"
+        aggregation: "monthly"
+        show_change: true
+      - name: "AI Insights"
+        type: "insights"
+        optional: true
+
+  inventory:
+    name: "Inventory Report"
+    description: "Stock analysis with inventory levels, reorder alerts, and value distribution"
+    required_columns:
+      product:
+        aliases: ["Product", "Item", "SKU", "product_name", "ProductName", "item_name", "ItemName"]
+        type: "string"
+      category:
+        aliases: ["Category", "Type", "Group", "category", "product_category", "ProductCategory"]
+        type: "string"
+      quantity:
+        aliases: ["Quantity", "Stock", "Units", "quantity", "QTY", "stock_level", "OnHand"]
+        type: "numeric"
+      reorder_level:
+        aliases: ["Reorder_Level", "Min_Stock", "reorder_level", "MinQuantity", "minimum_stock"]
+        type: "numeric"
+      unit_cost:
+        aliases: ["Unit_Cost", "Cost", "Price", "unit_cost", "UnitPrice", "cost_per_unit"]
+        type: "numeric"
+    optional_columns:
+      supplier:
+        aliases: ["Supplier", "Vendor", "supplier_name", "VendorName"]
+        type: "string"
+      location:
+        aliases: ["Location", "Warehouse", "location", "storage_location"]
+        type: "string"
+      last_restocked:
+        aliases: ["Last_Restocked", "restock_date", "LastRestockDate"]
+        type: "datetime"
+    sections:
+      - name: "Inventory Summary"
+        type: "summary"
+        metrics: ["total_skus", "total_units", "total_value", "items_below_reorder"]
+      - name: "Stock Status by Category"
+        type: "chart"
+        chart_type: "bar"
+        group_by: "category"
+        metric: "quantity"
+      - name: "Reorder Alerts"
+        type: "table"
+        filter: "quantity <= reorder_level"
+        sort_by: "quantity"
+        order: "ascending"
+      - name: "Value Distribution"
+        type: "chart"
+        chart_type: "pie"
+        group_by: "category"
+        metric: "value"
+        calculated: "quantity * unit_cost"
+      - name: "Top Items by Value"
+        type: "table"
+        sort_by: "value"
+        order: "descending"
+        limit: 15
+      - name: "AI Insights"
+        type: "insights"
+        optional: true
+
+# Global settings
+settings:
+  max_file_size_mb: 10
+  max_rows: 500000
+  supported_formats: [".csv", ".xlsx", ".xls"]
+  date_formats:
+    - "%Y-%m-%d"
+    - "%m/%d/%Y"
+    - "%d/%m/%Y"
+    - "%Y/%m/%d"
+    - "%d-%m-%Y"
+    - "%m-%d-%Y"
