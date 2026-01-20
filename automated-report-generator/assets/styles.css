@@ -137,89 +137,90 @@ body {
 }
 
 /* ================================================================
-   3. HEADER - AI-Animated Dark Theme Hero
+   3. HEADER - Node Network Animated Background (matching Landing Hero)
    ================================================================ */
 .app-header {
   text-align: center;
   padding: var(--space-10) var(--space-4) var(--space-8);
-  background: linear-gradient(135deg, #0a0f1a 0%, #0f172a 30%, #1a1f3a 60%, #0f172a 100%);
+  background: linear-gradient(135deg, #050810 0%, #0a0f1a 20%, #0f172a 50%, #1a1f3a 80%, #0f172a 100%);
   margin: calc(-1 * var(--space-5)) calc(-1 * var(--space-4)) var(--space-6) calc(-1 * var(--space-4));
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid rgba(99, 102, 241, 0.2);
 }
 
-/* Animated aurora background */
-.app-header::before {
-  content: '';
+/* Mesh gradient background - matches landing hero */
+.app-header__mesh {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  inset: 0;
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 40% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
-    radial-gradient(ellipse at 70% 30%, rgba(168, 85, 247, 0.08) 0%, transparent 45%);
-  animation: aurora 15s ease-in-out infinite;
+    radial-gradient(ellipse 80% 50% at 20% 30%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 60% at 50% 80%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 70% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+  animation: meshShift 20s ease-in-out infinite;
   pointer-events: none;
 }
 
-/* Floating orb 1 - Large indigo */
-.app-header .orb-1 {
+/* Light beams - matches landing hero */
+.header-beam {
   position: absolute;
-  top: 10%;
-  left: 15%;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.4), rgba(99, 102, 241, 0.1) 50%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(40px);
-  animation: float 8s ease-in-out infinite;
+  width: 2px;
+  height: 300%;
+  background: linear-gradient(to bottom, transparent, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2), transparent);
+  transform-origin: top center;
   pointer-events: none;
 }
 
-/* Floating orb 2 - Purple */
-.app-header .orb-2 {
+.header-beam--1 {
+  left: 25%;
+  top: -100%;
+  transform: rotate(-15deg);
+  animation: beamSweep 8s ease-in-out infinite;
+}
+
+.header-beam--2 {
+  left: 75%;
+  top: -100%;
+  transform: rotate(15deg);
+  animation: beamSweep 10s ease-in-out infinite 2s;
+}
+
+/* Node network SVG - matches landing hero style */
+.header-network {
   position: absolute;
-  top: 20%;
-  right: 10%;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle at 30% 30%, rgba(168, 85, 247, 0.35), rgba(139, 92, 246, 0.1) 50%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(35px);
-  animation: float-reverse 10s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0.5;
   pointer-events: none;
 }
 
-/* Floating orb 3 - Blue accent */
-.app-header .orb-3 {
-  position: absolute;
-  bottom: 10%;
-  left: 30%;
-  width: 120px;
-  height: 120px;
-  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.05) 50%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(30px);
-  animation: breathe 6s ease-in-out infinite;
-  pointer-events: none;
+.header-node {
+  animation: nodePulse 4s ease-in-out infinite;
 }
 
-/* Floating orb 4 - Pink/magenta */
-.app-header .orb-4 {
-  position: absolute;
-  bottom: 20%;
-  right: 25%;
-  width: 100px;
-  height: 100px;
-  background: radial-gradient(circle at 30% 30%, rgba(236, 72, 153, 0.25), rgba(236, 72, 153, 0.05) 50%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(25px);
-  animation: drift 12s ease-in-out infinite;
-  pointer-events: none;
+.header-node:nth-child(1) { animation-delay: 0s; }
+.header-node:nth-child(2) { animation-delay: 0.3s; }
+.header-node:nth-child(3) { animation-delay: 0.6s; }
+.header-node:nth-child(4) { animation-delay: 0.9s; }
+.header-node:nth-child(5) { animation-delay: 1.2s; }
+.header-node:nth-child(6) { animation-delay: 0.4s; }
+.header-node:nth-child(7) { animation-delay: 0.7s; }
+.header-node:nth-child(8) { animation-delay: 1.0s; }
+.header-node:nth-child(9) { animation-delay: 1.3s; }
+
+.header-line {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: lineTrace 3s ease-in-out infinite;
+}
+
+/* Header content container */
+.app-header__content {
+  position: relative;
+  z-index: 10;
 }
 
 /* Subtle noise texture overlay */
@@ -437,8 +438,8 @@ p.app-header__subtitle {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-brand-50);
-  color: var(--color-brand);
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
   border-radius: var(--radius-md);
 }
 
@@ -450,30 +451,40 @@ p.app-header__subtitle {
 .section__title {
   font-size: var(--text-base);
   font-weight: var(--font-semibold);
-  color: var(--color-gray-900);
+  color: #f1f5f9;
   margin: 0;
 }
 
 .section__desc {
   font-size: var(--text-xs);
-  color: var(--color-gray-500);
+  color: #94a3b8;
   margin: 2px 0 0 0;
+}
+
+/* Column label - compact section header */
+.column-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: #94a3b8;
+  margin: 0 0 var(--space-2) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* ================================================================
    6. CARDS - Elevated Surfaces
    ================================================================ */
 .card {
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-200);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   transition: all var(--duration-base) var(--ease-out);
 }
 
 .card:hover {
-  border-color: var(--color-gray-300);
-  box-shadow: var(--shadow-sm);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
 }
 
 /* Template Selection Card */
@@ -481,8 +492,8 @@ p.app-header__subtitle {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-200);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: var(--radius-lg);
   padding: var(--space-3);
   margin-bottom: var(--space-2);
@@ -491,14 +502,15 @@ p.app-header__subtitle {
 }
 
 .tpl-card:hover {
-  border-color: var(--color-brand-light);
-  background: var(--color-gray-25);
+  border-color: rgba(99, 102, 241, 0.5);
+  background: linear-gradient(135deg, #1e293b 0%, #1a1f3a 100%);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
 }
 
 .tpl-card--active {
   border-color: var(--color-brand);
-  background: var(--color-brand-50);
-  box-shadow: 0 0 0 2px var(--color-brand-100);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2), 0 0 30px rgba(99, 102, 241, 0.15);
 }
 
 .tpl-card__icon {
@@ -526,32 +538,36 @@ p.app-header__subtitle {
 .tpl-card__name {
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
-  color: var(--color-gray-900);
+  color: #f1f5f9;
   margin: 0 0 2px 0;
 }
 
 .tpl-card__info {
   font-size: var(--text-xs);
-  color: var(--color-gray-500);
+  color: #94a3b8;
   margin: 0;
+  line-height: 1.5;
 }
 
 .tpl-card__check {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-full);
-  background: var(--color-gray-100);
+  background: rgba(71, 85, 105, 0.5);
   color: transparent;
   flex-shrink: 0;
   transition: all var(--duration-fast);
+  border: 1px solid rgba(71, 85, 105, 0.5);
 }
 
 .tpl-card--active .tpl-card__check {
-  background: var(--color-brand);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
+  border-color: transparent;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
 }
 
 .tpl-card__check svg {
@@ -601,28 +617,32 @@ p.app-header__subtitle {
 }
 
 .alert--success {
-  background: var(--color-success-light);
-  color: #065f46;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
-.alert--success .alert__icon { color: var(--color-success); }
+.alert--success .alert__icon { color: #10b981; }
 
 .alert--error {
-  background: var(--color-error-light);
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
-.alert--error .alert__icon { color: var(--color-error); }
+.alert--error .alert__icon { color: #ef4444; }
 
 .alert--warning {
-  background: var(--color-warning-light);
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
-.alert--warning .alert__icon { color: var(--color-warning); }
+.alert--warning .alert__icon { color: #f59e0b; }
 
 .alert--info {
-  background: var(--color-info-light);
-  color: #1e40af;
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
-.alert--info .alert__icon { color: var(--color-info); }
+.alert--info .alert__icon { color: #3b82f6; }
 
 /* ================================================================
    8. BADGES - Labels & Tags
@@ -644,31 +664,35 @@ p.app-header__subtitle {
 }
 
 .badge--brand {
-  background: var(--color-brand-50);
-  color: var(--color-brand);
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
 .badge--success {
-  background: var(--color-success-light);
-  color: #065f46;
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .badge--warning {
-  background: var(--color-warning-light);
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .badge--neutral {
-  background: var(--color-gray-100);
-  color: var(--color-gray-600);
+  background: rgba(71, 85, 105, 0.3);
+  color: #94a3b8;
+  border: 1px solid rgba(71, 85, 105, 0.4);
 }
 
 /* ================================================================
    9. METRICS - Stat Cards
    ================================================================ */
 .metric {
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-200);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: var(--radius-lg);
   padding: var(--space-3);
   text-align: center;
@@ -681,7 +705,7 @@ p.app-header__subtitle {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-brand-50);
+  background: rgba(99, 102, 241, 0.15);
   color: var(--color-brand);
   border-radius: var(--radius-md);
 }
@@ -694,12 +718,12 @@ p.app-header__subtitle {
 .metric__val {
   font-size: var(--text-lg);
   font-weight: var(--font-bold);
-  color: var(--color-gray-900);
+  color: #f1f5f9;
 }
 
 .metric__label {
   font-size: var(--text-xs);
-  color: var(--color-gray-500);
+  color: #94a3b8;
   margin-top: 2px;
 }
 
@@ -742,7 +766,7 @@ p.app-header__subtitle {
 .sidebar__label {
   font-size: 10px;
   font-weight: var(--font-semibold);
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: var(--space-1);
@@ -811,8 +835,8 @@ p.app-header__subtitle {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-200);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: var(--radius-lg);
   padding: var(--space-3);
   margin-bottom: var(--space-2);
@@ -820,8 +844,8 @@ p.app-header__subtitle {
 }
 
 .dl-card:hover {
-  border-color: var(--color-gray-300);
-  box-shadow: var(--shadow-sm);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
 }
 
 .dl-card__icon {
@@ -840,13 +864,13 @@ p.app-header__subtitle {
 }
 
 .dl-card__icon--pdf {
-  background: var(--color-error-light);
-  color: var(--color-error);
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
 }
 
 .dl-card__icon--docx {
-  background: var(--color-info-light);
-  color: var(--color-info);
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
 }
 
 .dl-card__body {
@@ -857,20 +881,20 @@ p.app-header__subtitle {
 .dl-card__name {
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
-  color: var(--color-gray-800);
+  color: #f1f5f9;
 }
 
 .dl-card__meta {
   font-size: var(--text-xs);
-  color: var(--color-gray-500);
+  color: #94a3b8;
 }
 
 /* ================================================================
    13. PROGRESS - Loading State
    ================================================================ */
 .progress-box {
-  background: var(--color-white);
-  border: 1px solid var(--color-gray-200);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   text-align: center;
@@ -884,7 +908,7 @@ p.app-header__subtitle {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-brand-50);
+  background: rgba(99, 102, 241, 0.15);
   border-radius: var(--radius-full);
   animation: pulse-glow 2s ease-in-out infinite;
 }
@@ -906,9 +930,9 @@ p.app-header__subtitle {
 .app-footer {
   text-align: center;
   padding: var(--space-4);
-  color: var(--color-gray-400);
+  color: #64748b;
   font-size: var(--text-xs);
-  border-top: 1px solid var(--color-gray-100);
+  border-top: 1px solid rgba(71, 85, 105, 0.5);
   margin-top: var(--space-6);
 }
 
@@ -918,7 +942,7 @@ p.app-header__subtitle {
   justify-content: center;
   gap: var(--space-1);
   margin-bottom: var(--space-1);
-  color: var(--color-gray-500);
+  color: #94a3b8;
 }
 
 .app-footer__brand svg {
@@ -1122,24 +1146,63 @@ p.app-header__subtitle {
 /* Checkbox */
 .stCheckbox > label {
   font-weight: var(--font-medium) !important;
-  color: var(--color-gray-700) !important;
+  color: #e2e8f0 !important;
 }
 
-/* Expander */
+.stCheckbox > label p {
+  color: #e2e8f0 !important;
+}
+
+/* Expander - Dark Theme */
 .streamlit-expanderHeader {
   font-weight: var(--font-semibold) !important;
   font-size: var(--text-sm) !important;
-  color: var(--color-gray-700) !important;
-  background: var(--color-gray-50) !important;
+  color: #f1f5f9 !important;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  border: 1px solid rgba(71, 85, 105, 0.5) !important;
   border-radius: var(--radius-md) !important;
   padding: var(--space-2) var(--space-3) !important;
 }
 
 .streamlit-expanderContent {
-  border: 1px solid var(--color-gray-200) !important;
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(71, 85, 105, 0.5) !important;
   border-top: none !important;
   border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
   padding: var(--space-3) !important;
+}
+
+/* Expander SVG icon */
+.streamlit-expanderHeader svg {
+  fill: #94a3b8 !important;
+}
+
+/* Additional expander overrides */
+[data-testid="stExpander"] {
+  background: transparent !important;
+  border: none !important;
+}
+
+[data-testid="stExpander"] details {
+  background: transparent !important;
+}
+
+[data-testid="stExpander"] summary {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  border: 1px solid rgba(71, 85, 105, 0.5) !important;
+  border-radius: var(--radius-md) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-testid="stExpander"] details[open] summary {
+  border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+}
+
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(71, 85, 105, 0.5) !important;
+  border-top: none !important;
+  border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
 }
 
 /* Dataframe */
@@ -1154,10 +1217,29 @@ p.app-header__subtitle {
   border-radius: var(--radius-full) !important;
 }
 
+/* General Streamlit Text - Dark Theme */
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] span,
+[data-testid="stMarkdownContainer"] strong {
+  color: #e2e8f0 !important;
+}
+
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3 {
+  color: #f1f5f9 !important;
+}
+
+/* Selectbox/Multiselect labels */
+.stSelectbox label,
+.stMultiSelect label {
+  color: #94a3b8 !important;
+}
+
 /* Divider */
 hr {
   border: none;
-  border-top: 1px solid var(--color-gray-200);
+  border-top: 1px solid rgba(71, 85, 105, 0.5);
   margin: var(--space-4) 0;
 }
 

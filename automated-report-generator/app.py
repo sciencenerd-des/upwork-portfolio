@@ -281,22 +281,53 @@ def render_cta_strip():
 
 
 def render_header():
-    """Render header with animated AI-style background."""
+    """Render header with animated node network background matching landing hero."""
     render_html_block(f"""
     <div class="app-header fade-in">
-        <!-- Animated floating orbs -->
-        <div class="orb-1"></div>
-        <div class="orb-2"></div>
-        <div class="orb-3"></div>
-        <div class="orb-4"></div>
+        <!-- Mesh gradient background -->
+        <div class="app-header__mesh"></div>
+
+        <!-- Sweeping light beams -->
+        <div class="header-beam header-beam--1"></div>
+        <div class="header-beam header-beam--2"></div>
+
+        <!-- Animated node network -->
+        <svg class="header-network" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="headerNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.7" />
+                    <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0.4" />
+                </linearGradient>
+            </defs>
+            <circle class="header-node" cx="80" cy="40" r="4" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="200" cy="80" r="3" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="350" cy="30" r="5" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="500" cy="70" r="3" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="650" cy="45" r="4" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="750" cy="90" r="3" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="150" cy="150" r="3" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="400" cy="160" r="4" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="600" cy="140" r="3" fill="url(#headerNodeGrad)"/>
+            <path class="header-line" d="M80,40 Q140,60 200,80" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M200,80 Q275,55 350,30" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M350,30 Q425,50 500,70" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M500,70 Q575,57 650,45" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M650,45 Q700,67 750,90" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M150,150 Q275,155 400,160" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M400,160 Q500,150 600,140" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M200,80 Q175,115 150,150" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M500,70 Q450,115 400,160" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+        </svg>
 
         <!-- Header content -->
-        <div class="app-header__icon animate-glow">{get_icon('chart-bar', size=28)}</div>
-        <div class="app-header__title">Automated Report Generator</div>
-        <p class="app-header__subtitle" style="text-align: center; margin: 0 auto;">Transform your data into professional reports with AI-powered insights</p>
-        <div class="app-header__tag">
-            {get_icon('sparkles', size=14)}
-            <span>AI-Powered</span>
+        <div class="app-header__content">
+            <div class="app-header__icon animate-glow">{get_icon('chart-bar', size=28)}</div>
+            <div class="app-header__title">Automated Report Generator</div>
+            <p class="app-header__subtitle">Transform your data into professional reports with AI-powered insights</p>
+            <div class="app-header__tag">
+                {get_icon('sparkles', size=14)}
+                <span>AI-Powered</span>
+            </div>
         </div>
     </div>
     """)
@@ -327,7 +358,7 @@ def render_alert(type: str, title: str, text: str = ""):
     """Render alert message."""
     icon = STATUS_ICONS.get(type, "info")
     text_html = f'<div class="alert__text">{text}</div>' if text else ''
-    st.markdown(f"""
+    render_html_block(f"""
     <div class="alert alert--{type}">
         <div class="alert__icon">{get_icon(icon, 16)}</div>
         <div class="alert__body">
@@ -335,14 +366,14 @@ def render_alert(type: str, title: str, text: str = ""):
             {text_html}
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 
 def render_section(title: str, desc: str = "", icon_name: str = None):
-    """Render section header."""
+    """Render section header - compact version."""
     icon_html = f'<div class="section__icon">{get_icon(icon_name, 14)}</div>' if icon_name else ''
     desc_html = f'<p class="section__desc">{desc}</p>' if desc else ''
-    st.markdown(f"""
+    render_html_block(f"""
     <div class="section__head">
         {icon_html}
         <div>
@@ -350,18 +381,18 @@ def render_section(title: str, desc: str = "", icon_name: str = None):
             {desc_html}
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 
 def render_metric(label: str, value: str, icon_name: str = "chart-bar"):
     """Render metric card."""
-    st.markdown(f"""
+    render_html_block(f"""
     <div class="metric">
         <div class="metric__icon">{get_icon(icon_name, 16)}</div>
         <div class="metric__val">{value}</div>
         <div class="metric__label">{label}</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 
 # ============================================================================
@@ -451,7 +482,7 @@ def render_step_1():
                 render_alert("error", "Error", str(e))
 
     with col2:
-        st.markdown(f"""
+        render_html_block(f"""
         <div class="sidebar">
             <div class="sidebar__head">{get_icon('lightbulb', 16)} Quick Start</div>
             <div class="sidebar__group">
@@ -477,7 +508,7 @@ def render_step_1():
                 </ul>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
 
 # ============================================================================
@@ -499,7 +530,7 @@ def render_step_2():
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        render_section("Template", "", "file-text")
+        st.markdown('<p class="column-label">Template</p>', unsafe_allow_html=True)
         templates_config = load_config("templates")
 
         for t in TEMPLATES.keys():
@@ -509,7 +540,7 @@ def render_step_2():
             cls = "tpl-card--active" if is_sel else ""
             check = get_icon("check", 10) if is_sel else ""
 
-            st.markdown(f"""
+            render_html_block(f"""
             <div class="tpl-card {cls}">
                 <div class="tpl-card__icon">{get_icon(t_icon, 18)}</div>
                 <div class="tpl-card__body">
@@ -518,14 +549,14 @@ def render_step_2():
                 </div>
                 <div class="tpl-card__check">{check}</div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
             if st.button("Select" if not is_sel else "Selected", key=f"sel_{t}", type="primary" if is_sel else "secondary", use_container_width=True, disabled=is_sel):
                 st.session_state.selected_template = t
                 st.rerun()
 
     with col2:
-        render_section("Column Mapping", "", "link")
+        st.markdown('<p class="column-label">Column Mapping</p>', unsafe_allow_html=True)
 
         if st.session_state.selected_template:
             processor.set_template(st.session_state.selected_template)
@@ -561,7 +592,6 @@ def render_step_2():
             processor.set_column_mapping(mapping)
             is_valid, errors, warnings = processor.validate_mapping()
 
-            st.markdown("---")
             if errors:
                 for e in errors:
                     render_alert("error", "Error", e)
@@ -571,27 +601,20 @@ def render_step_2():
             if is_valid:
                 render_alert("success", "Valid", "All required fields mapped")
 
-    # Options
-    st.markdown("---")
-    render_section("Options", "", "filter")
-
-    opt1, opt2 = st.columns(2)
+    # Options and navigation in one row
+    opt1, opt2, nav_back, nav_next = st.columns([1, 1, 0.5, 0.5])
     with opt1:
         st.session_state.include_ai = st.checkbox("AI Insights", value=st.session_state.include_ai)
     with opt2:
-        fmts = st.multiselect("Formats", ['pdf', 'docx'], default=st.session_state.output_formats)
+        fmts = st.multiselect("Formats", ['pdf', 'docx'], default=st.session_state.output_formats, label_visibility="collapsed")
         st.session_state.output_formats = fmts if fmts else ['pdf']
 
-    # Navigation
-    st.markdown("---")
-    nav1, _, nav3 = st.columns([1, 1, 1])
-
-    with nav1:
+    with nav_back:
         if st.button("Back", use_container_width=True):
             st.session_state.step = 1
             st.rerun()
 
-    with nav3:
+    with nav_next:
         can_gen = is_valid and st.session_state.output_formats
         if st.button("Generate", type="primary", use_container_width=True, disabled=not can_gen):
             st.session_state.step = 3
@@ -613,11 +636,11 @@ def render_step_3():
             st.rerun()
         return
 
-    st.markdown(f"""
+    render_html_block(f"""
     <div class="progress-box">
         <div class="progress-box__icon">{get_icon('zap', 24)}</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     progress = st.progress(0)
     status = st.empty()
@@ -698,7 +721,7 @@ def render_step_4():
             icon = FILE_ICONS.get(fmt, "file")
             icon_cls = f"dl-card__icon--{fmt}"
 
-            st.markdown(f"""
+            render_html_block(f"""
             <div class="dl-card">
                 <div class="dl-card__icon {icon_cls}">{get_icon(icon, 18)}</div>
                 <div class="dl-card__body">
@@ -706,7 +729,7 @@ def render_step_4():
                     <div class="dl-card__meta">{data['filename']} • {size:.1f} KB</div>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+            """)
 
             st.download_button(
                 f"Download {fmt.upper()}",
@@ -753,7 +776,7 @@ def render_step_4():
 
 def render_footer():
     """Render footer."""
-    st.markdown(f"""
+    render_html_block(f"""
     <div class="app-footer">
         <div class="app-footer__brand">
             {get_icon('chart-bar', 12)}
@@ -761,7 +784,7 @@ def render_footer():
         </div>
         <p>Built with Streamlit • AI-Powered</p>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 
 # ============================================================================
