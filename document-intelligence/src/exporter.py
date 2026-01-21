@@ -11,7 +11,9 @@ import io
 import json
 import csv
 import logging
+import re
 from datetime import datetime
+from pathlib import PurePath
 from typing import Optional, Union
 
 import pandas as pd
@@ -25,6 +27,30 @@ from app.models import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitize filename to prevent path traversal attacks.
+    Removes directory components and dangerous characters.
+    """
+    # Normalize path separators (handle both Unix and Windows paths)
+    filename = filename.replace('\\', '/')
+
+    # Remove any directory components (Unix and Windows)
+    filename = PurePath(filename).name
+
+    # Remove potentially dangerous characters
+    filename = re.sub(r'[^\w\-.]', '_', filename)
+
+    # Remove leading dots and underscores
+    filename = filename.lstrip('._')
+
+    # Ensure it's not empty
+    if not filename:
+        filename = 'export'
+
+    return filename
 
 
 class Exporter:

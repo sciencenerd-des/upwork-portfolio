@@ -41,9 +41,9 @@ class DocumentStore:
         cleanup_interval_seconds: Optional[int] = None
     ):
         settings = get_settings()
-        self._ttl_minutes = ttl_minutes or settings.session.ttl_minutes
-        self._max_documents = max_documents or settings.session.max_documents_per_session
-        self._cleanup_interval = cleanup_interval_seconds or settings.session.cleanup_interval_seconds
+        self._ttl_minutes = ttl_minutes if ttl_minutes is not None else settings.session.ttl_minutes
+        self._max_documents = max_documents if max_documents is not None else settings.session.max_documents_per_session
+        self._cleanup_interval = cleanup_interval_seconds if cleanup_interval_seconds is not None else settings.session.cleanup_interval_seconds
 
         # Use OrderedDict for LRU-style eviction
         self._documents: OrderedDict[str, SessionDocument] = OrderedDict()
@@ -300,8 +300,8 @@ class DocumentStore:
     def _is_expired(self, session_doc: SessionDocument) -> bool:
         """Check if document has expired based on TTL."""
         if self._ttl_minutes <= 0:
-            # TTL of 0 means immediate expiration after creation
-            return datetime.utcnow() > session_doc.created_at
+            # TTL of 0 or negative means immediate expiration
+            return True
         expiry_time = session_doc.last_accessed + timedelta(minutes=self._ttl_minutes)
         return datetime.utcnow() > expiry_time
 

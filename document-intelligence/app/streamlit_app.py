@@ -374,6 +374,8 @@ def initialize_session_state():
 
 def get_confidence_class(confidence: float) -> str:
     """Get CSS class based on confidence level."""
+    if confidence is None:
+        return "confidence-low"
     if confidence >= 0.9:
         return "confidence-high"
     elif confidence >= 0.7:
@@ -384,6 +386,8 @@ def get_confidence_class(confidence: float) -> str:
 
 def format_confidence(confidence: float) -> str:
     """Format confidence as percentage with color."""
+    if confidence is None:
+        return '<span class="confidence-low">N/A</span>'
     css_class = get_confidence_class(confidence)
     return f'<span class="{css_class}">{confidence:.0%}</span>'
 
@@ -398,14 +402,20 @@ def process_document(file_content: bytes, filename: str) -> str:
     vector_store = get_document_vector_store()
     summarizer = get_summarizer()
 
-    # Get file info
-    ext = "." + filename.lower().split(".")[-1] if "." in filename else ""
+    # Validate file before processing (format, size, corruption, page count)
+    validation = loader.validate_file(file_content, filename)
+    if not validation.is_valid:
+        st.error(f"File validation failed: {validation.error_message}")
+        return ""
+
+    ext = validation.file_type or ("." + filename.lower().split(".")[-1] if "." in filename else "")
 
     # Create document
     doc_id = store.create_document(
         filename=filename,
         file_type=ext,
-        file_size_bytes=len(file_content)
+        file_size_bytes=len(file_content),
+        page_count=validation.page_count or 0
     )
 
     progress_bar = st.progress(0, text="Loading document...")
@@ -539,11 +549,14 @@ def render_upload_tab():
             with st.spinner("Processing document..."):
                 file_content = uploaded_file.read()
                 doc_id = process_document(file_content, uploaded_file.name)
-                st.session_state.doc_id = doc_id
-                st.session_state.document = get_document_store().get_document(doc_id)
-                st.session_state.chat_history = []
-                st.success(f"Document processed successfully!")
-                st.rerun()
+
+                # Check if processing succeeded (doc_id will be empty on validation failure)
+                if doc_id:
+                    st.session_state.doc_id = doc_id
+                    st.session_state.document = get_document_store().get_document(doc_id)
+                    st.session_state.chat_history = []
+                    st.success("Document processed successfully!")
+                    st.rerun()
     else:
         # Empty state
         render_html(f"""
@@ -693,6 +706,7 @@ def render_entities_tab():
         
         for item in items:
             conf_html = format_confidence(item.confidence)
+            item_value = item.value if item.value is not None else "N/A"
             extra_info = ""
             if show_extra == "parsed_date" and hasattr(item, 'parsed_date') and item.parsed_date:
                 extra_info = f' <span class="badge badge--neutral">Parsed: {item.parsed_date.strftime("%Y-%m-%d")}</span>'
@@ -709,7 +723,7 @@ def render_entities_tab():
             st.markdown(
                 f'<div class="entity-card motion-reveal motion-hover motion-hover--soft">'
                 f'<div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">'
-                f'<strong style="color: #111827;">{item.value}</strong>'
+                f'<strong style="color: #111827;">{item_value}</strong>'
                 f'<span style="font-size: 0.8rem;">Confidence: {conf_html}</span>'
                 f'</div>'
                 f'<div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">{extra_info}{page_info}</div>'
@@ -825,11 +839,17 @@ def render_qa_tab():
                 QAMessage(role=msg["role"], content=msg["content"])
                 for msg in st.session_state.chat_history[:-1]  # Exclude current question
             ]
-            response = qa_engine.answer(
-                doc_id=st.session_state.doc_id,
-                question=question,
-                conversation_history=history
-            )
+            try:
+                response = qa_engine.answer(
+                    doc_id=st.session_state.doc_id,
+                    question=question,
+                    conversation_history=history
+                )
+            except ValueError as e:
+                # Remove the user message we just added since the question failed
+                st.session_state.chat_history.pop()
+                st.error(f"Error: {e}")
+                st.stop()
 
         # Add assistant response
         st.session_state.chat_history.append({

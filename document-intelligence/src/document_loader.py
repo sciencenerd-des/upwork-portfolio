@@ -22,6 +22,22 @@ from app.models import FileValidation, PageContent
 
 logger = logging.getLogger(__name__)
 
+# Try to import python-magic for MIME type validation
+try:
+    import magic
+    MAGIC_AVAILABLE = True
+except ImportError:
+    MAGIC_AVAILABLE = False
+    logger.info("python-magic not available. MIME type validation will use file extension only.")
+
+# Allowed MIME types mapped to extensions
+ALLOWED_MIME_TYPES = {
+    "application/pdf": ".pdf",
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/tiff": ".tiff",
+}
+
 
 @dataclass
 class LoadedDocument:
@@ -60,7 +76,7 @@ class DocumentLoader:
     ) -> FileValidation:
         """
         Validate file before processing.
-        Checks: format, size, corruption, page count.
+        Checks: format, MIME type, size, corruption, page count.
         """
         # Check file extension
         ext = self._get_extension(filename)
@@ -71,6 +87,29 @@ class DocumentLoader:
                 file_type=ext,
                 file_size_bytes=len(file_content)
             )
+
+        # Check MIME type if python-magic is available
+        if MAGIC_AVAILABLE:
+            try:
+                detected_mime = magic.from_buffer(file_content, mime=True)
+                if detected_mime not in ALLOWED_MIME_TYPES:
+                    return FileValidation(
+                        is_valid=False,
+                        error_message=f"Invalid file content. Detected MIME type: {detected_mime}. File may be corrupted or disguised.",
+                        file_type=ext,
+                        file_size_bytes=len(file_content)
+                    )
+                # Verify extension matches MIME type
+                expected_ext = ALLOWED_MIME_TYPES[detected_mime]
+                # Allow .jpg/.jpeg and .tif/.tiff variants
+                ext_normalized = ext.lower()
+                expected_normalized = expected_ext.lower()
+                if ext_normalized not in [expected_normalized, expected_normalized.replace("jpeg", "jpg"), expected_normalized.replace("tiff", "tif")]:
+                    if not (ext_normalized in [".jpg", ".jpeg"] and detected_mime == "image/jpeg"):
+                        if not (ext_normalized in [".tif", ".tiff"] and detected_mime == "image/tiff"):
+                            logger.warning(f"Extension mismatch: {ext} vs detected {detected_mime}")
+            except Exception as e:
+                logger.warning(f"MIME type detection failed: {e}")
 
         # Check file size
         if len(file_content) > self._max_file_size:

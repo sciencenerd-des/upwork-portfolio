@@ -198,26 +198,98 @@ The system is designed to work even without external API keys:
 
 ## Docker Deployment
 
-```bash
-# Build image
-docker build -t document-intelligence .
+### Quick Start with Docker
 
-# Run container
+```bash
+# Build and run the API
+docker build -t document-intelligence .
 docker run -p 8000:8000 -e OPENROUTER_API_KEY=your_key document-intelligence
+
+# Access the API at http://localhost:8000
+```
+
+### Docker Compose (Recommended)
+
+```bash
+# Set environment variables
+export OPENROUTER_API_KEY=your_api_key
+export DI_API_KEY=your_secret_api_key  # Optional: for API authentication
+
+# Start both API and Streamlit UI
+docker-compose up --build
+
+# API available at http://localhost:8000
+# UI available at http://localhost:8501
+```
+
+### Production Deployment
+
+#### Railway
+
+1. Connect your repository to Railway
+2. Set environment variables:
+   - `OPENROUTER_API_KEY`: Your OpenRouter API key
+   - `DI_API_KEY`: Secret key for API authentication (optional)
+3. Railway will auto-detect the Dockerfile
+
+#### Render
+
+1. Create a new Web Service
+2. Connect to your repository
+3. Set the Dockerfile path
+4. Add environment variables in the dashboard
+
+#### Environment Variables for Production
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `OPENROUTER_API_KEY` | API key for LLM services | Optional |
+| `DI_API_KEY` | API key for authentication | Optional |
+
+### API Authentication
+
+When `DI_API_KEY` is set and `require_auth: true` in config, endpoints require the `X-API-Key` header:
+
+```bash
+curl -X POST http://localhost:8000/upload \
+  -H "X-API-Key: your_secret_key" \
+  -F "file=@document.pdf"
+```
+
+### Rate Limiting
+
+The API includes built-in rate limiting (default: 60 requests/minute per client).
+Configure in `config/settings.yaml`:
+
+```yaml
+api:
+  rate_limit_requests_per_minute: 60
 ```
 
 ## Development
 
 ```bash
-# Run tests
+# Run all tests
 pytest tests/
 
-# Run specific phase tests
+# Run specific test file
 pytest tests/test_phase1.py -v
+
+# Run enhancement tests (security, validation, etc.)
+pytest tests/test_enhancements.py -v
 
 # Check code style
 flake8 app/ src/
 ```
+
+### Test Coverage
+
+Tests are organized by functionality:
+- `test_phase1.py`: Configuration, models, document store
+- `test_phase2.py`: OCR and text processing
+- `test_phase3.py`: Entity extraction
+- `test_phase4.py`: Summarization and Q&A
+- `test_enhancements.py`: Security and reliability features
 
 ## License
 

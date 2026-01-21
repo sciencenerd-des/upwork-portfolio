@@ -29,13 +29,31 @@ class LLMClient:
 
     def __init__(self):
         self.settings = get_settings()
-        self._api_key = os.getenv("OPENROUTER_API_KEY")
+        # Use settings instead of os.getenv for consistent configuration
+        self._api_key = self.settings.openrouter_api_key
         self._base_url = self.settings.llm.base_url
         self._primary_model = self.settings.llm.primary_model
         self._fallback_model = self.settings.llm.fallback_model
         self._max_tokens = self.settings.llm.max_tokens
         self._temperature = self.settings.llm.temperature
         self._timeout = self.settings.llm.timeout_seconds
+        # Reusable HTTP client for connection pooling
+        self._http_client: Optional[httpx.Client] = None
+
+    def _get_http_client(self) -> httpx.Client:
+        """Get or create reusable HTTP client for connection pooling."""
+        if self._http_client is None:
+            self._http_client = httpx.Client(
+                timeout=self._timeout,
+                limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
+            )
+        return self._http_client
+
+    def close(self) -> None:
+        """Close the HTTP client and release resources."""
+        if self._http_client is not None:
+            self._http_client.close()
+            self._http_client = None
 
     def chat(
         self,
@@ -61,28 +79,28 @@ class LLMClient:
         model = model or self._primary_model
 
         try:
-            with httpx.Client(timeout=self._timeout) as client:
-                response = client.post(
-                    f"{self._base_url}/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {self._api_key}",
-                        "Content-Type": "application/json",
-                        "HTTP-Referer": "https://document-intelligence.local",
-                    },
-                    json={
-                        "model": model,
-                        "messages": [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": user_prompt}
-                        ],
-                        "max_tokens": self._max_tokens,
-                        "temperature": self._temperature,
-                    }
-                )
-                response.raise_for_status()
-                data = response.json()
+            client = self._get_http_client()
+            response = client.post(
+                f"{self._base_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self._api_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://document-intelligence.local",
+                },
+                json={
+                    "model": model,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    "max_tokens": self._max_tokens,
+                    "temperature": self._temperature,
+                }
+            )
+            response.raise_for_status()
+            data = response.json()
 
-                return data["choices"][0]["message"]["content"]
+            return data["choices"][0]["message"]["content"]
 
         except httpx.HTTPStatusError as e:
             logger.error(f"LLM API error: {e.response.status_code} - {e.response.text}")

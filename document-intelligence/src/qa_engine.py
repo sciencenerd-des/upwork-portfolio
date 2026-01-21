@@ -18,6 +18,7 @@ from datetime import datetime
 from app.config import get_settings, get_prompts
 from app.models import QARequest, QAResponse, QASource, QAMessage
 from src.vector_store import DocumentVectorStore, get_document_vector_store
+from src.document_store import get_document_store
 from src.summarizer import LLMClient, get_llm_client
 
 logger = logging.getLogger(__name__)
@@ -58,13 +59,36 @@ class QAEngine:
 
         Returns:
             QAResponse with answer, sources, and suggested questions
+
+        Raises:
+            ValueError: If doc_id or question is invalid
         """
         import time
         start_time = time.time()
 
-        # Retrieve relevant context
+        # Input validation
+        if not doc_id or not doc_id.strip():
+            raise ValueError("Document ID cannot be empty")
+
+        if not question or not question.strip():
+            raise ValueError("Question cannot be empty")
+
+        question = question.strip()
+
+        # Check if document exists
+        doc_store = get_document_store()
+        if not doc_store.document_exists(doc_id):
+            raise ValueError(f"Document {doc_id} not found")
+
+        # Retrieve relevant context via vector search
         context_chunks = self._retrieve_context(doc_id, question)
 
+        # If no context from vector search, fall back to lexical/keyword search
+        if not context_chunks:
+            logger.info(f"No vector context found for doc {doc_id}, trying lexical fallback")
+            context_chunks = self._lexical_fallback(doc_id, question)
+
+        # If still no context after fallback, return no context response
         if not context_chunks:
             return self._no_context_response(start_time)
 
@@ -101,6 +125,76 @@ class QAEngine:
         except Exception as e:
             logger.error(f"Context retrieval failed: {e}")
             return []
+
+    def _lexical_fallback(self, doc_id: str, question: str) -> list[dict]:
+        """
+        Fallback to lexical/keyword search when vector retrieval fails.
+        Uses stored document chunks with simple keyword matching.
+        """
+        doc_store = get_document_store()
+        doc = doc_store.get_document(doc_id)
+
+        if not doc:
+            return []
+
+        # Prepare question keywords (lowercase, filter stopwords)
+        stopwords = {
+            "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
+            "have", "has", "had", "do", "does", "did", "will", "would", "could",
+            "should", "may", "might", "must", "shall", "can", "need", "dare",
+            "this", "that", "these", "those", "what", "which", "who", "whom",
+            "where", "when", "why", "how", "in", "on", "at", "to", "for", "of",
+            "with", "by", "from", "as", "about", "into", "through", "during",
+            "before", "after", "above", "below", "between", "and", "or", "not",
+            "it", "its", "i", "me", "my", "you", "your", "he", "she", "we", "they"
+        }
+
+        question_lower = question.lower()
+        question_words = set(
+            w for w in re.findall(r'\b\w+\b', question_lower)
+            if w not in stopwords and len(w) > 2
+        )
+
+        if not question_words:
+            # No meaningful keywords, return empty
+            return []
+
+        scored_chunks = []
+
+        # Score each stored chunk by keyword overlap
+        for chunk in doc.chunks:
+            chunk_text = chunk.text.lower()
+            chunk_words = set(re.findall(r'\b\w+\b', chunk_text))
+
+            # Calculate overlap score
+            overlap = question_words & chunk_words
+            if overlap:
+                # Score = number of matching keywords / total question keywords
+                score = len(overlap) / len(question_words)
+                scored_chunks.append({
+                    "text": chunk.text,
+                    "metadata": {
+                        "page_number": chunk.page_number,
+                        "chunk_id": chunk.chunk_id,
+                    },
+                    "score": score,
+                    "overlap_count": len(overlap)
+                })
+
+        # Sort by score (descending) and return top-k
+        scored_chunks.sort(key=lambda x: (-x["score"], -x["overlap_count"]))
+
+        # Return top chunks that meet a minimum threshold
+        min_score_threshold = 0.1  # At least 10% of keywords should match
+        results = [
+            c for c in scored_chunks[:self._max_context_chunks]
+            if c["score"] >= min_score_threshold
+        ]
+
+        if results:
+            logger.info(f"Lexical fallback found {len(results)} relevant chunks")
+
+        return results
 
     def _build_context(self, chunks: list[dict]) -> str:
         """Build context string from retrieved chunks."""
@@ -222,14 +316,18 @@ class QAEngine:
         return sources
 
     def _no_context_response(self, start_time: float) -> QAResponse:
-        """Return response when no context is available."""
+        """Return response when no relevant context is found in the document."""
         import time
 
         return QAResponse(
-            answer="I don't have any document loaded to answer questions about. Please upload a document first.",
+            answer=self._no_answer_response,
             confidence=0.0,
             sources=[],
-            suggested_questions=[],
+            suggested_questions=[
+                "What is the main purpose of this document?",
+                "What are the key dates mentioned?",
+                "What is the total amount?",
+            ],
             processing_time_ms=int((time.time() - start_time) * 1000)
         )
 

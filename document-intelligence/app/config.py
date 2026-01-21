@@ -130,6 +130,8 @@ class APIConfig(BaseModel):
     port: int = 8000
     cors_origins: list[str] = ["http://localhost:8501", "http://127.0.0.1:8501"]
     rate_limit_requests_per_minute: int = 60
+    api_key: Optional[str] = None  # If set, requires X-API-Key header
+    require_auth: bool = False  # Enable/disable API key authentication
 
 
 class AppConfig(BaseModel):

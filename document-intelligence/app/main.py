@@ -11,10 +11,15 @@ REST API for Document Intelligence System.
 import io
 import asyncio
 import logging
+import time
+from collections import defaultdict
 from typing import Optional
 from datetime import datetime
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks, Query
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks, Query, Depends, Request
+from fastapi.security import APIKeyHeader
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -41,17 +46,34 @@ from src.entity_extractor import get_entity_extractor
 from src.vector_store import get_document_vector_store
 from src.summarizer import get_summarizer
 from src.qa_engine import get_qa_engine
-from src.exporter import get_exporter
+from src.exporter import get_exporter, sanitize_filename
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan - startup and shutdown."""
+    # Startup: Start the document store TTL cleanup task
+    store = get_document_store()
+    store.start_cleanup_task()
+    logger.info("Document store cleanup task started")
+
+    yield
+
+    # Shutdown: Stop the cleanup task
+    store.stop_cleanup_task()
+    logger.info("Document store cleanup task stopped")
+
 
 # Initialize FastAPI app
 app = FastAPI(
     title="Document Intelligence API",
     description="API for document processing with OCR, entity extraction, summarization, and Q&A",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Add CORS middleware
@@ -68,13 +90,134 @@ settings = get_settings()
 
 
 # =============================================================================
+# Rate Limiting (simple in-memory implementation)
+# =============================================================================
+
+class RateLimiter:
+    """Simple in-memory rate limiter."""
+
+    def __init__(self, requests_per_minute: int = 60):
+        self.requests_per_minute = requests_per_minute
+        self.requests: dict[str, list[float]] = defaultdict(list)
+
+    def is_allowed(self, client_id: str) -> bool:
+        """Check if request is allowed for the client."""
+        now = time.time()
+        window_start = now - 60  # 1 minute window
+
+        # Clean old requests
+        self.requests[client_id] = [
+            t for t in self.requests[client_id] if t > window_start
+        ]
+
+        # Check limit
+        if len(self.requests[client_id]) >= self.requests_per_minute:
+            return False
+
+        # Record request
+        self.requests[client_id].append(now)
+        return True
+
+    def get_remaining(self, client_id: str) -> int:
+        """Get remaining requests for the client."""
+        now = time.time()
+        window_start = now - 60
+        current = len([t for t in self.requests[client_id] if t > window_start])
+        return max(0, self.requests_per_minute - current)
+
+
+rate_limiter = RateLimiter(settings.api.rate_limit_requests_per_minute)
+
+
+# =============================================================================
+# Authentication
+# =============================================================================
+
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+
+async def verify_api_key(
+    request: Request,
+    api_key: Optional[str] = Depends(api_key_header)
+) -> Optional[str]:
+    """
+    Verify API key if authentication is enabled.
+    Returns the API key if valid, raises HTTPException if invalid.
+    """
+    # Skip auth if not required
+    if not settings.api.require_auth:
+        return None
+
+    # Skip auth for health check and root endpoints
+    if request.url.path in ["/", "/health"]:
+        return None
+
+    if not api_key:
+        raise HTTPException(
+            status_code=401,
+            detail="API key required. Provide X-API-Key header."
+        )
+
+    if api_key != settings.api.api_key:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid API key"
+        )
+
+    return api_key
+
+
+async def check_rate_limit(request: Request) -> None:
+    """Check rate limit for the client."""
+    # Use client IP as identifier
+    client_id = request.client.host if request.client else "unknown"
+
+    if not rate_limiter.is_allowed(client_id):
+        remaining = rate_limiter.get_remaining(client_id)
+        raise HTTPException(
+            status_code=429,
+            detail=f"Rate limit exceeded. Try again in 60 seconds.",
+            headers={
+                "X-RateLimit-Limit": str(settings.api.rate_limit_requests_per_minute),
+                "X-RateLimit-Remaining": str(remaining),
+                "Retry-After": "60"
+            }
+        )
+
+
+# =============================================================================
 # Health Check
 # =============================================================================
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
-    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+    """
+    Health check endpoint with dependency status.
+    Returns degraded status if optional dependencies are unavailable.
+    """
+    from src.ocr_engine import TESSERACT_AVAILABLE
+    from src.entity_extractor import SPACY_AVAILABLE
+    from src.vector_store import CHROMADB_AVAILABLE
+
+    checks = {
+        "tesseract": TESSERACT_AVAILABLE,
+        "spacy": SPACY_AVAILABLE,
+        "chromadb": CHROMADB_AVAILABLE,
+        "openrouter_api_key": bool(settings.openrouter_api_key),
+    }
+
+    all_healthy = all(checks.values())
+    # Core features work without API key (fallback to local), so partial is ok
+    core_healthy = checks["tesseract"] or checks["spacy"] or checks["chromadb"]
+
+    status = "healthy" if all_healthy else ("degraded" if core_healthy else "unhealthy")
+
+    return {
+        "status": status,
+        "timestamp": datetime.utcnow().isoformat(),
+        "checks": checks,
+        "version": "1.0.0"
+    }
 
 
 @app.get("/")
@@ -99,9 +242,10 @@ async def root():
 # Document Upload & Processing
 # =============================================================================
 
-async def process_document_async(doc_id: str, file_content: bytes, filename: str):
+def _sync_process_document(doc_id: str, file_content: bytes, filename: str):
     """
-    Background task to process uploaded document.
+    Synchronous document processing logic.
+    Called via asyncio.to_thread to avoid blocking the event loop.
     """
     store = get_document_store()
     loader = get_document_loader()
@@ -111,107 +255,118 @@ async def process_document_async(doc_id: str, file_content: bytes, filename: str
     vector_store = get_document_vector_store()
     summarizer = get_summarizer()
 
+    # Update status to processing
+    doc = store.get_document(doc_id)
+    if not doc:
+        logger.error(f"Document {doc_id} not found in store")
+        return
+
+    store.set_status(doc_id, DocumentStatus.PROCESSING)
+
+    # Step 1: Load document (CPU-bound: PDF parsing)
+    logger.info(f"Loading document: {filename}")
+    load_result = loader.load(file_content, filename)
+
+    if not load_result:
+        store.set_error(doc_id, "Failed to load document")
+        return
+
+    # Update metadata
+    doc.metadata.page_count = load_result.page_count
+    doc.metadata.is_scanned = load_result.is_scanned
+
+    # Step 2: Extract text (OCR if needed - CPU-bound)
+    logger.info(f"Extracting text from {load_result.page_count} pages")
+    from app.models import PageContent
+    pages = []
+    all_text = []
+
+    # Map images to their page indices (images are only for scanned pages)
+    image_idx = 0
+
+    for page in load_result.pages:
+        page_text = page.text or ""
+        ocr_confidence = None
+        is_scanned = page.is_scanned
+
+        # If page is scanned and we have an image for it, run OCR
+        if is_scanned and image_idx < len(load_result.images):
+            ocr_result = ocr_engine.ocr_image(load_result.images[image_idx], page.page_number)
+            if ocr_result and ocr_result.text:
+                page_text = ocr_result.text
+                ocr_confidence = ocr_result.confidence
+            image_idx += 1
+
+        pages.append(PageContent(
+            page_number=page.page_number,
+            text=page_text,
+            is_scanned=is_scanned,
+            ocr_confidence=ocr_confidence
+        ))
+        all_text.append(page_text)
+
+    doc.pages = pages
+    doc.raw_text = "\n\n".join(all_text)
+
+    # Step 3: Process text (clean, chunk) - CPU-bound
+    logger.info("Processing text")
+    processed = text_processor.process(doc.raw_text)
+    doc.chunks = processed.chunks
+
+    # Step 4: Extract entities - CPU-bound (spaCy NER)
+    logger.info("Extracting entities")
+    doc.entities = entity_extractor.extract(doc.raw_text)
+
+    # Add page numbers to entities where possible
+    for page in pages:
+        page_text = page.text.lower()
+        for entity_list in [doc.entities.dates, doc.entities.amounts,
+                           doc.entities.invoice_numbers, doc.entities.gstins,
+                           doc.entities.pans]:
+            for entity in entity_list:
+                if entity.value.lower() in page_text and not entity.page_number:
+                    entity.page_number = page.page_number
+
+    # Step 5: Index in vector store (I/O-bound: embedding API calls)
+    logger.info("Indexing in vector store")
+    if doc.chunks:
+        vector_store.index_document(doc_id, doc.chunks)
+
+    # Step 6: Generate summary (I/O-bound: LLM API call)
+    logger.info("Generating summary")
+    word_count = len(doc.raw_text.split())
+    doc.summary = summarizer.summarize(
+        doc.raw_text,
+        word_count=word_count,
+        page_count=doc.metadata.page_count
+    )
+
+    # Mark as completed
+    store.update_document(doc_id, doc)
+    store.set_status(doc_id, DocumentStatus.COMPLETED)
+    logger.info(f"Document {doc_id} processing completed")
+
+
+async def process_document_async(doc_id: str, file_content: bytes, filename: str):
+    """
+    Background task to process uploaded document.
+    Offloads CPU-bound work to a thread pool to avoid blocking the event loop.
+    """
     try:
-        # Update status to processing
-        doc = store.get_document(doc_id)
-        if not doc:
-            logger.error(f"Document {doc_id} not found in store")
-            return
-
-        store.set_status(doc_id, DocumentStatus.PROCESSING)
-
-        # Step 1: Load document
-        logger.info(f"Loading document: {filename}")
-        load_result = loader.load(file_content, filename)
-
-        if not load_result:
-            store.set_error(doc_id, "Failed to load document")
-            return
-
-        # Update metadata
-        doc.metadata.page_count = load_result.page_count
-        doc.metadata.is_scanned = load_result.is_scanned
-
-        # Step 2: Extract text (OCR if needed)
-        logger.info(f"Extracting text from {load_result.page_count} pages")
-        from app.models import PageContent
-        pages = []
-        all_text = []
-
-        # Map images to their page indices (images are only for scanned pages)
-        image_idx = 0
-
-        for page in load_result.pages:
-            page_text = page.text or ""
-            ocr_confidence = None
-            is_scanned = page.is_scanned
-
-            # If page is scanned and we have an image for it, run OCR
-            if is_scanned and image_idx < len(load_result.images):
-                ocr_result = ocr_engine.process_image(load_result.images[image_idx])
-                if ocr_result and ocr_result.text:
-                    page_text = ocr_result.text
-                    ocr_confidence = ocr_result.confidence
-                image_idx += 1
-
-            pages.append(PageContent(
-                page_number=page.page_number,
-                text=page_text,
-                is_scanned=is_scanned,
-                ocr_confidence=ocr_confidence
-            ))
-            all_text.append(page_text)
-
-        doc.pages = pages
-        doc.raw_text = "\n\n".join(all_text)
-
-        # Step 3: Process text (clean, chunk)
-        logger.info("Processing text")
-        processed = text_processor.process(doc.raw_text)
-        doc.chunks = processed.chunks
-
-        # Step 4: Extract entities
-        logger.info("Extracting entities")
-        doc.entities = entity_extractor.extract(doc.raw_text)
-
-        # Add page numbers to entities where possible
-        for page in pages:
-            page_text = page.text.lower()
-            for entity_list in [doc.entities.dates, doc.entities.amounts,
-                               doc.entities.invoice_numbers, doc.entities.gstins,
-                               doc.entities.pans]:
-                for entity in entity_list:
-                    if entity.value.lower() in page_text and not entity.page_number:
-                        entity.page_number = page.page_number
-
-        # Step 5: Index in vector store
-        logger.info("Indexing in vector store")
-        if doc.chunks:
-            vector_store.index_document(doc_id, doc.chunks)
-
-        # Step 6: Generate summary
-        logger.info("Generating summary")
-        word_count = len(doc.raw_text.split())
-        doc.summary = summarizer.summarize(
-            doc.raw_text,
-            word_count=word_count,
-            page_count=doc.metadata.page_count
-        )
-
-        # Mark as completed
-        store.update_document(doc_id, doc)
-        store.set_status(doc_id, DocumentStatus.COMPLETED)
-        logger.info(f"Document {doc_id} processing completed")
-
+        # Run the synchronous processing in a thread pool
+        await asyncio.to_thread(_sync_process_document, doc_id, file_content, filename)
     except Exception as e:
         logger.error(f"Processing failed for {doc_id}: {e}")
+        store = get_document_store()
         store.set_error(doc_id, str(e))
 
 
 @app.post("/upload", response_model=UploadResponse)
 async def upload_document(
+    request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
+    _api_key: Optional[str] = Depends(verify_api_key),
 ):
     """
     Upload a document for processing.
@@ -219,35 +374,35 @@ async def upload_document(
     Accepts PDF and image files (PNG, JPG, JPEG, TIFF).
     Processing happens in the background.
     """
-    # Validate file type
-    allowed_types = {".pdf", ".png", ".jpg", ".jpeg", ".tiff", ".tif"}
-    filename = file.filename or "document"
-    file_ext = "." + filename.lower().split(".")[-1] if "." in filename else ""
+    # Check rate limit
+    await check_rate_limit(request)
 
-    if file_ext not in allowed_types:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported file type: {file_ext}. Allowed: {', '.join(allowed_types)}"
-        )
+    filename = file.filename or "document"
 
     # Read file content
     content = await file.read()
     file_size = len(content)
 
-    # Validate file size
-    max_size = settings.document.max_file_size_mb * 1024 * 1024
-    if file_size > max_size:
+    # Use DocumentLoader.validate_file for comprehensive validation
+    # (format, size, corruption, page count limits)
+    loader = get_document_loader()
+    validation = loader.validate_file(content, filename)
+
+    if not validation.is_valid:
         raise HTTPException(
             status_code=400,
-            detail=f"File too large: {file_size / 1024 / 1024:.1f}MB. Max: {settings.document.max_file_size_mb}MB"
+            detail=validation.error_message or "File validation failed"
         )
+
+    file_ext = validation.file_type or ("." + filename.lower().split(".")[-1] if "." in filename else "")
 
     # Create document in store
     store = get_document_store()
     doc_id = store.create_document(
         filename=filename,
         file_type=file_ext,
-        file_size_bytes=file_size
+        file_size_bytes=file_size,
+        page_count=validation.page_count or 0
     )
 
     # Start background processing
@@ -407,13 +562,21 @@ async def get_entities(
 # =============================================================================
 
 @app.post("/qa/{doc_id}", response_model=QAResponse)
-async def ask_question(doc_id: str, request: QARequest):
+async def ask_question(
+    doc_id: str,
+    qa_request: QARequest,
+    request: Request,
+    _api_key: Optional[str] = Depends(verify_api_key),
+):
     """
     Ask a question about the document.
 
     Uses RAG (Retrieval Augmented Generation) to find relevant
     context and generate an answer with citations.
     """
+    # Check rate limit
+    await check_rate_limit(request)
+
     store = get_document_store()
     doc = store.get_document(doc_id)
 
@@ -431,15 +594,18 @@ async def ask_question(doc_id: str, request: QARequest):
 
     # Get Q&A engine and answer
     qa_engine = get_qa_engine()
-    response = qa_engine.answer(
-        doc_id=doc_id,
-        question=request.question,
-        conversation_history=qa_history,
-        include_sources=request.include_sources if hasattr(request, 'include_sources') else True
-    )
+    try:
+        response = qa_engine.answer(
+            doc_id=doc_id,
+            question=qa_request.question,
+            conversation_history=qa_history,
+            include_sources=qa_request.include_sources if hasattr(qa_request, 'include_sources') else True
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     # Add to conversation history
-    store.add_conversation_message(doc_id, "user", request.question)
+    store.add_conversation_message(doc_id, "user", qa_request.question)
     store.add_conversation_message(doc_id, "assistant", response.answer)
 
     return response
@@ -534,10 +700,17 @@ async def export_document(
 # =============================================================================
 
 @app.delete("/document/{doc_id}")
-async def delete_document(doc_id: str):
+async def delete_document(
+    doc_id: str,
+    request: Request,
+    _api_key: Optional[str] = Depends(verify_api_key),
+):
     """
     Delete a document and all associated data.
     """
+    # Check rate limit
+    await check_rate_limit(request)
+
     store = get_document_store()
     vector_store = get_document_vector_store()
 

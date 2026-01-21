@@ -42,9 +42,13 @@ class EmbeddingProvider:
     Generates embeddings using OpenRouter API with fallback to local models.
     """
 
+    # Maximum batch size for embedding API calls to avoid request size limits
+    MAX_BATCH_SIZE = 100
+
     def __init__(self):
         self.settings = get_settings()
-        self._api_key = os.getenv("OPENROUTER_API_KEY")
+        # Use settings instead of os.getenv for consistent configuration
+        self._api_key = self.settings.openrouter_api_key
         self._base_url = self.settings.llm.base_url
         self._model = self.settings.llm.embedding_model
         self._dimension = self.settings.vector_store.embedding_dimension
@@ -52,6 +56,9 @@ class EmbeddingProvider:
         # Fallback model
         self._local_model = None
         self._use_local = False
+
+        # Reusable HTTP client for connection pooling
+        self._http_client: Optional[httpx.Client] = None
 
         if not self._api_key:
             logger.warning("OPENROUTER_API_KEY not set. Using local embeddings.")
@@ -72,8 +79,23 @@ class EmbeddingProvider:
         """Generate embedding for single text."""
         return self.embed_batch([text])[0]
 
+    def _get_http_client(self) -> httpx.Client:
+        """Get or create reusable HTTP client for connection pooling."""
+        if self._http_client is None:
+            self._http_client = httpx.Client(
+                timeout=60.0,
+                limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
+            )
+        return self._http_client
+
+    def close(self) -> None:
+        """Close the HTTP client and release resources."""
+        if self._http_client is not None:
+            self._http_client.close()
+            self._http_client = None
+
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings for multiple texts."""
+        """Generate embeddings for multiple texts with automatic batching."""
         if not texts:
             return []
 
@@ -81,7 +103,18 @@ class EmbeddingProvider:
             return self._embed_local(texts)
 
         try:
-            return self._embed_openrouter(texts)
+            # Batch large requests to avoid API size limits
+            if len(texts) <= self.MAX_BATCH_SIZE:
+                return self._embed_openrouter(texts)
+            else:
+                # Process in batches
+                all_embeddings = []
+                for i in range(0, len(texts), self.MAX_BATCH_SIZE):
+                    batch = texts[i:i + self.MAX_BATCH_SIZE]
+                    batch_embeddings = self._embed_openrouter(batch)
+                    all_embeddings.extend(batch_embeddings)
+                return all_embeddings
+
         except Exception as e:
             logger.warning(f"OpenRouter embedding failed: {e}. Using fallback.")
             self._use_local = True
@@ -90,25 +123,25 @@ class EmbeddingProvider:
             return self._embed_local(texts)
 
     def _embed_openrouter(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings using OpenRouter API."""
-        with httpx.Client(timeout=60.0) as client:
-            response = client.post(
-                f"{self._base_url}/embeddings",
-                headers={
-                    "Authorization": f"Bearer {self._api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": self._model,
-                    "input": texts,
-                }
-            )
-            response.raise_for_status()
-            data = response.json()
+        """Generate embeddings using OpenRouter API with connection reuse."""
+        client = self._get_http_client()
+        response = client.post(
+            f"{self._base_url}/embeddings",
+            headers={
+                "Authorization": f"Bearer {self._api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": self._model,
+                "input": texts,
+            }
+        )
+        response.raise_for_status()
+        data = response.json()
 
-            # Extract embeddings from response
-            embeddings = [item["embedding"] for item in data["data"]]
-            return embeddings
+        # Extract embeddings from response
+        embeddings = [item["embedding"] for item in data["data"]]
+        return embeddings
 
     def _embed_local(self, texts: list[str]) -> list[list[float]]:
         """Generate embeddings using local model."""
