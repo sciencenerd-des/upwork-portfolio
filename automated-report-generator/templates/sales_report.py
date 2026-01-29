@@ -414,8 +414,17 @@ class SalesReportTemplate:
             raw_data_context=raw_data_context,
         )
 
-        return {
+        # Track if fallback was used
+        section = {
             "type": "insights",
-            "title": "AI-Generated Insights",
+            "title": "AI-Generated Insights" if not self.ai_insights.fallback_used else "Statistical Insights",
             "insights": insights,
         }
+
+        # Add a note if fallback was used
+        if self.ai_insights.fallback_used:
+            section["fallback_note"] = "AI insights were not available. Using statistical analysis instead."
+            if self.ai_insights.last_error:
+                section["error_detail"] = self.ai_insights.last_error
+
+        return section

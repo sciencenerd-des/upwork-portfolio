@@ -1,8 +1,7 @@
 """
 Automated Report Generator - Streamlit Application
 
-A step-by-step wizard for generating professional PDF and Word reports
-from CSV/Excel data with AI-powered insights.
+Modern, clean UI inspired by Height, Clay, Sana AI
 """
 
 import streamlit as st
@@ -10,14 +9,53 @@ import pandas as pd
 from pathlib import Path
 import tempfile
 import base64
+import logging
 from io import BytesIO
 
 from src.data_processor import DataProcessor
 from src.utils import load_config
 from templates import get_template, TEMPLATES
 
+# Import icon system
+import sys
+sys.path.insert(0, str(Path(__file__).parent / "assets"))
+from icons import get_icon, TEMPLATE_ICONS, STATUS_ICONS, FILE_ICONS
 
-# Page configuration
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# DATA LOADING (Cached)
+# ============================================================================
+
+@st.cache_data(show_spinner=False)
+def load_and_validate_data(file_content: bytes, file_name: str, sheet_name: str = None) -> pd.DataFrame:
+    """Load and validate data from file content."""
+    import io
+    ext = Path(file_name).suffix.lower()
+    if ext == ".csv":
+        df = pd.read_csv(io.BytesIO(file_content), encoding="utf-8")
+    elif ext in [".xlsx", ".xls"]:
+        df = pd.read_excel(io.BytesIO(file_content), sheet_name=sheet_name) if sheet_name else pd.read_excel(io.BytesIO(file_content))
+    else:
+        raise ValueError(f"Unsupported format: {ext}")
+    df.columns = [str(col).strip() for col in df.columns]
+    return df
+
+
+@st.cache_data(show_spinner=False)
+def get_excel_sheet_names(file_content: bytes) -> list:
+    """Get sheet names from Excel file."""
+    import io
+    return pd.ExcelFile(io.BytesIO(file_content)).sheet_names
+
+
+# ============================================================================
+# PAGE CONFIG
+# ============================================================================
+
 st.set_page_config(
     page_title="Automated Report Generator",
     page_icon="📊",
@@ -25,687 +63,757 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Custom CSS for professional styling
-st.markdown("""
-<style>
-    /* Main container styling */
-    .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        max-width: 1200px;
-    }
 
-    /* Header styling */
-    .main-header {
-        text-align: center;
-        padding: 1rem 0 2rem 0;
-        border-bottom: 2px solid #e0e0e0;
-        margin-bottom: 2rem;
-    }
+# ============================================================================
+# CSS
+# ============================================================================
 
-    .main-header h1 {
-        color: #1e3a5f;
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-    }
+def load_css():
+    """Load CSS from external file."""
+    css_path = Path(__file__).parent / "assets" / "styles.css"
+    if css_path.exists():
+        st.markdown(f"<style>{css_path.read_text()}</style>", unsafe_allow_html=True)
 
-    .main-header p {
-        color: #666;
-        font-size: 1.1rem;
-    }
+load_css()
 
-    /* Step indicator styling */
-    .step-container {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 2rem;
-        gap: 0;
-    }
 
-    .step {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1.5rem;
-        background: #f5f5f5;
-        color: #888;
-        font-weight: 500;
-        border: 1px solid #e0e0e0;
-    }
-
-    .step.active {
-        background: #2563eb;
-        color: white;
-        border-color: #2563eb;
-    }
-
-    .step.completed {
-        background: #10b981;
-        color: white;
-        border-color: #10b981;
-    }
-
-    .step-number {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 0.75rem;
-        font-weight: bold;
-    }
-
-    .step.active .step-number,
-    .step.completed .step-number {
-        background: rgba(255,255,255,0.3);
-    }
-
-    /* Card styling */
-    .stCard {
-        background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        margin-bottom: 1rem;
-    }
-
-    /* Button styling */
-    .stButton > button {
-        width: 100%;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-    }
-
-    /* Success message styling */
-    .success-box {
-        background: #d1fae5;
-        border: 1px solid #10b981;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-
-    /* Error message styling */
-    .error-box {
-        background: #fee2e2;
-        border: 1px solid #ef4444;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-
-    /* Warning message styling */
-    .warning-box {
-        background: #fef3c7;
-        border: 1px solid #f59e0b;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-
-    /* Metric styling */
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
-        padding: 1.25rem;
-        color: white;
-        text-align: center;
-    }
-
-    .metric-value {
-        font-size: 2rem;
-        font-weight: bold;
-    }
-
-    .metric-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-    }
-
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-
-    /* Data preview table */
-    .dataframe {
-        font-size: 0.9rem;
-    }
-
-    /* Template card */
-    .template-card {
-        border: 2px solid #e0e0e0;
-        border-radius: 10px;
-        padding: 1.25rem;
-        margin: 0.5rem 0;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .template-card:hover {
-        border-color: #2563eb;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-    }
-
-    .template-card.selected {
-        border-color: #2563eb;
-        background: #eff6ff;
-    }
-
-    .template-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1e3a5f;
-        margin-bottom: 0.5rem;
-    }
-
-    .template-description {
-        color: #666;
-        font-size: 0.9rem;
-    }
-</style>
-""", unsafe_allow_html=True)
-
+# ============================================================================
+# SESSION STATE
+# ============================================================================
 
 def init_session_state():
-    """Initialize session state variables."""
-    if 'step' not in st.session_state:
-        st.session_state.step = 1
-    if 'uploaded_file' not in st.session_state:
-        st.session_state.uploaded_file = None
-    if 'df' not in st.session_state:
-        st.session_state.df = None
-    if 'processor' not in st.session_state:
-        st.session_state.processor = None
-    if 'selected_template' not in st.session_state:
-        st.session_state.selected_template = None
-    if 'column_mapping' not in st.session_state:
-        st.session_state.column_mapping = {}
-    if 'generated_reports' not in st.session_state:
-        st.session_state.generated_reports = {}
-    if 'include_ai' not in st.session_state:
-        st.session_state.include_ai = True
-    if 'output_formats' not in st.session_state:
-        st.session_state.output_formats = ['pdf']
+    """Initialize session state."""
+    defaults = {
+        'step': 1,
+        'uploaded_file': None,
+        'df': None,
+        'processor': None,
+        'selected_template': None,
+        'column_mapping': {},
+        'generated_reports': {},
+        'include_ai': True,
+        'output_formats': ['pdf'],
+        'missing_value_strategy': 'none',
+    }
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+
+# ============================================================================
+# UI COMPONENTS
+# ============================================================================
+
+def render_html_block(html: str) -> None:
+    """Render raw HTML safely without Markdown indentation issues."""
+    cleaned = "\n".join(line.lstrip() for line in html.splitlines()).strip()
+    st.markdown(cleaned, unsafe_allow_html=True)
+
+
+def render_landing_hero():
+    """Render animated landing hero section with Mobbin-inspired design."""
+    render_html_block(f"""
+    <div class="landing-hero">
+        <!-- Mesh gradient background -->
+        <div class="landing-hero__mesh"></div>
+        
+        <!-- Sweeping light beams -->
+        <div class="light-beam light-beam--1"></div>
+        <div class="light-beam light-beam--2"></div>
+        <div class="light-beam light-beam--3"></div>
+        
+        <!-- Floating glass cards -->
+        <div class="glass-card glass-card--1">
+            <div class="glass-card__icon">{get_icon('chart-bar', size=20)}</div>
+            <span>Analytics</span>
+        </div>
+        <div class="glass-card glass-card--2">
+            <div class="glass-card__icon">{get_icon('sparkles', size=20)}</div>
+            <span>AI Insights</span>
+        </div>
+        <div class="glass-card glass-card--3">
+            <div class="glass-card__icon">{get_icon('file-text', size=20)}</div>
+            <span>Reports</span>
+        </div>
+        
+        <!-- Animated node network -->
+        <svg class="node-network" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.6" />
+                    <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0.3" />
+                </linearGradient>
+            </defs>
+            <circle class="node node--1" cx="50" cy="40" r="4" fill="url(#nodeGrad)"/>
+            <circle class="node node--2" cx="120" cy="80" r="3" fill="url(#nodeGrad)"/>
+            <circle class="node node--3" cx="200" cy="30" r="5" fill="url(#nodeGrad)"/>
+            <circle class="node node--4" cx="280" cy="70" r="3" fill="url(#nodeGrad)"/>
+            <circle class="node node--5" cx="350" cy="50" r="4" fill="url(#nodeGrad)"/>
+            <circle class="node node--6" cx="90" cy="150" r="3" fill="url(#nodeGrad)"/>
+            <circle class="node node--7" cx="180" cy="120" r="4" fill="url(#nodeGrad)"/>
+            <circle class="node node--8" cx="300" cy="160" r="3" fill="url(#nodeGrad)"/>
+            <path class="node-line" d="M50,40 Q85,60 120,80" stroke="url(#nodeGrad)" stroke-width="1" fill="none"/>
+            <path class="node-line" d="M120,80 Q160,55 200,30" stroke="url(#nodeGrad)" stroke-width="1" fill="none"/>
+            <path class="node-line" d="M200,30 Q240,50 280,70" stroke="url(#nodeGrad)" stroke-width="1" fill="none"/>
+            <path class="node-line" d="M280,70 Q315,60 350,50" stroke="url(#nodeGrad)" stroke-width="1" fill="none"/>
+            <path class="node-line" d="M90,150 Q135,135 180,120" stroke="url(#nodeGrad)" stroke-width="1" fill="none"/>
+            <path class="node-line" d="M180,120 Q240,140 300,160" stroke="url(#nodeGrad)" stroke-width="1" fill="none"/>
+            <path class="node-line" d="M120,80 Q105,115 90,150" stroke="url(#nodeGrad)" stroke-width="1" fill="none"/>
+            <path class="node-line" d="M280,70 Q290,115 300,160" stroke="url(#nodeGrad)" stroke-width="1" fill="none"/>
+        </svg>
+        
+        <!-- Hero content -->
+        <div class="landing-hero__content">
+            <div class="landing-hero__badge reveal-up" style="animation-delay: 0.1s;">
+                {get_icon('zap', size=12)}
+                <span>Powered by AI</span>
+            </div>
+            <h1 class="landing-hero__title reveal-up" style="animation-delay: 0.2s;">
+                Transform Data Into<br/>
+                <span class="gradient-text">Stunning Reports</span>
+            </h1>
+            <p class="landing-hero__desc reveal-up" style="animation-delay: 0.3s;">
+                Upload your spreadsheets and let AI generate beautiful, insight-rich reports in seconds. No design skills required.
+            </p>
+            <div class="landing-hero__cta reveal-up" style="animation-delay: 0.4s;">
+                <a href="#upload" class="btn-primary-glow">
+                    {get_icon('upload', size=16)}
+                    <span>Start Generating</span>
+                </a>
+                <a href="#features" class="btn-ghost">
+                    <span>See Features</span>
+                    {get_icon('arrow-right', size=14)}
+                </a>
+            </div>
+        </div>
+    </div>
+    """)
+
+
+def render_bento_grid():
+    """Render bento grid product preview section."""
+    render_html_block(f"""
+    <div class="bento-section" id="features">
+        <div class="bento-header reveal-up">
+            <span class="bento-label">Features</span>
+            <h2 class="bento-title">Everything you need for<br/>professional reports</h2>
+        </div>
+        
+        <div class="bento-grid">
+            <!-- Large feature card -->
+            <div class="bento-card bento-card--large reveal-up" style="animation-delay: 0.1s;">
+                <div class="bento-card__visual">
+                    <div class="bento-preview">
+                        <div class="preview-chart">
+                            <div class="chart-bar" style="height: 60%;"></div>
+                            <div class="chart-bar" style="height: 80%;"></div>
+                            <div class="chart-bar" style="height: 45%;"></div>
+                            <div class="chart-bar" style="height: 90%;"></div>
+                            <div class="chart-bar" style="height: 70%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bento-card__content">
+                    <div class="bento-card__icon">{get_icon('chart-bar', size=20)}</div>
+                    <h3>Auto-Generated Charts</h3>
+                    <p>AI analyzes your data structure and creates the perfect visualizations automatically.</p>
+                </div>
+            </div>
+            
+            <!-- Stacked cards -->
+            <div class="bento-stack">
+                <div class="bento-card bento-card--half reveal-up" style="animation-delay: 0.2s;">
+                    <div class="bento-card__icon bento-card__icon--purple">{get_icon('sparkles', size=20)}</div>
+                    <h3>AI Insights</h3>
+                    <p>Get intelligent analysis and recommendations from your data.</p>
+                    <div class="bento-pill-group">
+                        <span class="bento-pill">Trends</span>
+                        <span class="bento-pill">Anomalies</span>
+                        <span class="bento-pill">Predictions</span>
+                    </div>
+                </div>
+                <div class="bento-card bento-card--half reveal-up" style="animation-delay: 0.3s;">
+                    <div class="bento-card__icon bento-card__icon--cyan">{get_icon('file-text', size=20)}</div>
+                    <h3>Multiple Formats</h3>
+                    <p>Export to PDF, DOCX, or share directly.</p>
+                    <div class="format-icons">
+                        <span class="format-icon format-icon--pdf">PDF</span>
+                        <span class="format-icon format-icon--docx">DOCX</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wide card -->
+            <div class="bento-card bento-card--wide reveal-up" style="animation-delay: 0.4s;">
+                <div class="bento-card__content">
+                    <div class="bento-card__icon bento-card__icon--green">{get_icon('zap', size=20)}</div>
+                    <div>
+                        <h3>Lightning Fast</h3>
+                        <p>Generate comprehensive reports in under 30 seconds with our optimized pipeline.</p>
+                    </div>
+                </div>
+                <div class="speed-visual">
+                    <div class="speed-line"></div>
+                    <div class="speed-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    """)
+
+
+def render_cta_strip():
+    """Render call-to-action strip before the main workflow."""
+    render_html_block(f"""
+    <div class="cta-strip reveal-up" id="upload">
+        <div class="cta-strip__content">
+            <div class="cta-strip__icon">{get_icon('upload', size=24)}</div>
+            <div class="cta-strip__text">
+                <h3>Ready to create your first report?</h3>
+                <p>Upload your CSV or Excel file below to get started</p>
+            </div>
+        </div>
+        <div class="cta-strip__arrow">
+            {get_icon('arrow-down', size=20)}
+        </div>
+    </div>
+    """)
 
 
 def render_header():
-    """Render the main header."""
-    st.markdown("""
-    <div class="main-header">
-        <h1>Automated Report Generator</h1>
-        <p>Transform your data into professional reports with AI-powered insights</p>
-    </div>
-    """, unsafe_allow_html=True)
+    """Render header with animated node network background matching landing hero."""
+    render_html_block(f"""
+    <div class="app-header fade-in">
+        <!-- Mesh gradient background -->
+        <div class="app-header__mesh"></div>
 
+        <!-- Sweeping light beams -->
+        <div class="header-beam header-beam--1"></div>
+        <div class="header-beam header-beam--2"></div>
 
-def render_step_indicator():
-    """Render the step progress indicator."""
-    steps = [
-        ("1", "Upload Data"),
-        ("2", "Configure"),
-        ("3", "Generate"),
-        ("4", "Download"),
-    ]
+        <!-- Animated node network -->
+        <svg class="header-network" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="headerNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.7" />
+                    <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0.4" />
+                </linearGradient>
+            </defs>
+            <circle class="header-node" cx="80" cy="40" r="4" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="200" cy="80" r="3" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="350" cy="30" r="5" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="500" cy="70" r="3" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="650" cy="45" r="4" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="750" cy="90" r="3" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="150" cy="150" r="3" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="400" cy="160" r="4" fill="url(#headerNodeGrad)"/>
+            <circle class="header-node" cx="600" cy="140" r="3" fill="url(#headerNodeGrad)"/>
+            <path class="header-line" d="M80,40 Q140,60 200,80" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M200,80 Q275,55 350,30" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M350,30 Q425,50 500,70" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M500,70 Q575,57 650,45" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M650,45 Q700,67 750,90" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M150,150 Q275,155 400,160" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M400,160 Q500,150 600,140" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M200,80 Q175,115 150,150" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+            <path class="header-line" d="M500,70 Q450,115 400,160" stroke="url(#headerNodeGrad)" stroke-width="1" fill="none"/>
+        </svg>
 
-    html = '<div class="step-container">'
-    for i, (num, label) in enumerate(steps, 1):
-        if i < st.session_state.step:
-            status = "completed"
-            icon = "✓"
-        elif i == st.session_state.step:
-            status = "active"
-            icon = num
-        else:
-            status = ""
-            icon = num
-
-        html += f'''
-        <div class="step {status}">
-            <span class="step-number">{icon}</span>
-            {label}
+        <!-- Header content -->
+        <div class="app-header__content">
+            <div class="app-header__icon animate-glow">{get_icon('chart-bar', size=28)}</div>
+            <div class="app-header__title">Automated Report Generator</div>
+            <p class="app-header__subtitle">Transform your data into professional reports with AI-powered insights</p>
+            <div class="app-header__tag">
+                {get_icon('sparkles', size=14)}
+                <span>AI-Powered</span>
+            </div>
         </div>
-        '''
-    html += '</div>'
+    </div>
+    """)
 
+
+def render_steps():
+    """Render step indicator."""
+    steps = [(1, "Upload"), (2, "Configure"), (3, "Generate"), (4, "Download")]
+    html = '<div class="steps">'
+    for i, (num, label) in enumerate(steps):
+        if i > 0:
+            line_class = "step__line--done" if num <= st.session_state.step else ""
+            html += f'<div class="step__line {line_class}"></div>'
+
+        if num < st.session_state.step:
+            cls, num_content = "step--done", get_icon("check", 12)
+        elif num == st.session_state.step:
+            cls, num_content = "step--active", str(num)
+        else:
+            cls, num_content = "", str(num)
+
+        html += f'<div class="step {cls}"><span class="step__num">{num_content}</span><span>{label}</span></div>'
+    html += '</div>'
     st.markdown(html, unsafe_allow_html=True)
 
 
-def render_step_1_upload():
-    """Render Step 1: Data Upload."""
-    st.markdown("### Step 1: Upload Your Data")
-    st.markdown("Upload one or more CSV/Excel files to get started. Multiple files will be combined into a single dataset.")
+def render_alert(type: str, title: str, text: str = ""):
+    """Render alert message."""
+    icon = STATUS_ICONS.get(type, "info")
+    text_html = f'<div class="alert__text">{text}</div>' if text else ''
+    render_html_block(f"""
+    <div class="alert alert--{type}">
+        <div class="alert__icon">{get_icon(icon, 16)}</div>
+        <div class="alert__body">
+            <div class="alert__title">{title}</div>
+            {text_html}
+        </div>
+    </div>
+    """)
+
+
+def render_section(title: str, desc: str = "", icon_name: str = None):
+    """Render section header - compact version."""
+    icon_html = f'<div class="section__icon">{get_icon(icon_name, 14)}</div>' if icon_name else ''
+    desc_html = f'<p class="section__desc">{desc}</p>' if desc else ''
+    render_html_block(f"""
+    <div class="section__head">
+        {icon_html}
+        <div>
+            <div class="section__title">{title}</div>
+            {desc_html}
+        </div>
+    </div>
+    """)
+
+
+def render_metric(label: str, value: str, icon_name: str = "chart-bar"):
+    """Render metric card."""
+    render_html_block(f"""
+    <div class="metric">
+        <div class="metric__icon">{get_icon(icon_name, 16)}</div>
+        <div class="metric__val">{value}</div>
+        <div class="metric__label">{label}</div>
+    </div>
+    """)
+
+
+# ============================================================================
+# STEP 1: UPLOAD
+# ============================================================================
+
+def render_step_1():
+    """Step 1: Upload data."""
+    render_section("Upload Your Data", "CSV or Excel files", "upload")
 
     col1, col2 = st.columns([2, 1])
 
     with col1:
         uploaded_files = st.file_uploader(
-            "Choose file(s)",
+            "Choose files",
             type=['csv', 'xlsx', 'xls'],
-            help="Supported formats: CSV, Excel (.xlsx, .xls). Upload multiple files to combine them.",
             accept_multiple_files=True,
+            label_visibility="collapsed",
         )
 
         if uploaded_files:
             try:
-                # Create processor and load data
                 processor = DataProcessor()
+                file_contents = [f.getvalue() for f in uploaded_files]
+                file_names = [f.name for f in uploaded_files]
 
-                # Save files temporarily and collect paths
-                tmp_paths = []
-                file_names = []
-                for uploaded_file in uploaded_files:
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(uploaded_file.name).suffix) as tmp:
-                        tmp.write(uploaded_file.getvalue())
-                        tmp_paths.append(tmp.name)
-                        file_names.append(uploaded_file.name)
+                # Handle Excel sheets
+                excel_sheets = {}
+                for i, (content, name) in enumerate(zip(file_contents, file_names)):
+                    if Path(name).suffix.lower() in ['.xlsx', '.xls']:
+                        sheets = get_excel_sheet_names(content)
+                        if len(sheets) > 1:
+                            excel_sheets[i] = {'name': name, 'sheets': sheets}
 
-                # Load single or multiple files
-                if len(tmp_paths) == 1:
-                    processor.load_file(tmp_paths[0])
+                selected_sheets = {}
+                if excel_sheets:
+                    st.markdown("---")
+                    render_section("Select Sheet", "", "table")
+                    for idx, info in excel_sheets.items():
+                        selected_sheets[idx] = st.selectbox(info['name'], info['sheets'], key=f"sheet_{idx}")
+
+                # Load data
+                if len(file_contents) == 1:
+                    df = load_and_validate_data(file_contents[0], file_names[0], selected_sheets.get(0))
+                    processor.df = df
                 else:
-                    processor.load_multiple_files(tmp_paths, file_names)
+                    dfs = [load_and_validate_data(c, n, selected_sheets.get(i)) for i, (c, n) in enumerate(zip(file_contents, file_names))]
+                    processor.df = pd.concat(dfs, ignore_index=True)
 
-                # Store in session
                 st.session_state.uploaded_file = uploaded_files
                 st.session_state.df = processor.df
                 st.session_state.processor = processor
 
-                # Show success message
-                if len(uploaded_files) == 1:
-                    st.success(f"Successfully loaded **{file_names[0]}** ({len(processor.df):,} rows, {len(processor.df.columns)} columns)")
-                else:
-                    st.success(f"Successfully combined **{len(uploaded_files)} files** ({len(processor.df):,} total rows, {len(processor.df.columns)} columns)")
-                    with st.expander("Files loaded"):
-                        for name in file_names:
-                            st.markdown(f"- {name}")
+                # Success
+                st.markdown("---")
+                render_alert("success", "Data loaded", f"{len(processor.df):,} rows • {len(processor.df.columns)} columns")
 
-                # Show any warnings from loading
-                if processor.validation_warnings:
-                    for warning in processor.validation_warnings:
-                        st.warning(warning)
+                # Preview
+                st.markdown("---")
+                render_section("Preview", "First 10 rows", "table")
 
-                # Data preview
-                st.markdown("#### Data Preview")
-                st.dataframe(processor.df.head(10), use_container_width=True)
+                col_a, col_b, col_c = st.columns(3)
+                with col_a:
+                    st.markdown(f'<span class="badge badge--brand">{get_icon("grid", 10)} {len(processor.df):,} rows</span>', unsafe_allow_html=True)
+                with col_b:
+                    st.markdown(f'<span class="badge badge--brand">{get_icon("table", 10)} {len(processor.df.columns)} cols</span>', unsafe_allow_html=True)
 
-                # Column info
-                st.markdown("#### Detected Columns")
-                col_types = processor.detect_column_types()
+                st.dataframe(processor.df.head(10), use_container_width=True, hide_index=True)
 
-                col_df = pd.DataFrame([
-                    {
-                        "Column": col,
-                        "Type": col_types.get(col, "unknown").capitalize(),
-                        "Sample Values": ", ".join(str(v) for v in processor.df[col].dropna().head(3).tolist())
-                    }
-                    for col in processor.df.columns
-                ])
-                st.dataframe(col_df, use_container_width=True, hide_index=True)
-
-                # Suggest template
+                # Template suggestion
                 suggested, confidence = processor.suggest_template()
                 if suggested:
-                    st.info(f"**Suggested Template:** {suggested.replace('_', ' ').title()} Report (confidence: {confidence:.0%})")
+                    st.markdown("---")
+                    icon = TEMPLATE_ICONS.get(suggested, "file")
+                    render_alert("info", "Suggested Template", f"<strong>{suggested.replace('_', ' ').title()}</strong> ({confidence:.0%} match)")
                     st.session_state.selected_template = suggested
 
-                # Continue button
+                # Continue
                 st.markdown("---")
-                if st.button("Continue to Configuration", type="primary", use_container_width=True):
-                    st.session_state.step = 2
-                    st.rerun()
+                _, btn_col, _ = st.columns([1, 2, 1])
+                with btn_col:
+                    if st.button("Continue", type="primary", use_container_width=True):
+                        st.session_state.step = 2
+                        st.rerun()
 
             except Exception as e:
-                st.error(f"Error loading file: {str(e)}")
-                st.markdown("""
-                **Troubleshooting tips:**
-                - Make sure your file is a valid CSV or Excel file
-                - Check that the file isn't corrupted or password-protected
-                - Ensure the file contains data with headers
-                """)
+                render_alert("error", "Error", str(e))
 
     with col2:
-        st.markdown("#### Quick Start")
-        st.markdown("""
-        **Sample data available:**
-
-        Try our demo with sample data files in the `sample_data/` folder:
-        - `sales_sample.csv` - Sales transactions
-        - `financial_sample.csv` - Financial records
-        - `inventory_sample.csv` - Inventory data
+        render_html_block(f"""
+        <div class="sidebar">
+            <div class="sidebar__head">{get_icon('lightbulb', 16)} Quick Start</div>
+            <div class="sidebar__group">
+                <div class="sidebar__label">Sample Files</div>
+                <ul class="sidebar__list">
+                    <li>sales_sample.csv</li>
+                    <li>financial_sample.csv</li>
+                    <li>inventory_sample.csv</li>
+                </ul>
+            </div>
+            <div class="sidebar__group">
+                <div class="sidebar__label">Formats</div>
+                <ul class="sidebar__list">
+                    <li>CSV (.csv)</li>
+                    <li>Excel (.xlsx, .xls)</li>
+                </ul>
+            </div>
+            <div class="sidebar__group">
+                <div class="sidebar__label">Limits</div>
+                <ul class="sidebar__list">
+                    <li>200 MB max</li>
+                    <li>500K rows max</li>
+                </ul>
+            </div>
+        </div>
         """)
 
-        st.markdown("#### Supported Formats")
-        st.markdown("""
-        - **CSV** - Comma-separated values
-        - **Excel** - .xlsx and .xls files
-        - **Multiple files** - Upload and combine
-        - **Max size:** 10MB per file
-        - **Max rows:** 500,000 total
-        """)
 
+# ============================================================================
+# STEP 2: CONFIGURE
+# ============================================================================
 
-def render_step_2_configure():
-    """Render Step 2: Configuration."""
-    st.markdown("### Step 2: Configure Your Report")
+def render_step_2():
+    """Step 2: Configure report."""
+    render_section("Configure Report", "Select template and map columns", "settings")
 
     if st.session_state.processor is None:
-        st.warning("Please upload data first.")
-        if st.button("Go Back to Upload"):
+        render_alert("warning", "No data", "Please upload data first.")
+        if st.button("Back"):
             st.session_state.step = 1
             st.rerun()
         return
 
     processor = st.session_state.processor
-
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.markdown("#### Select Report Template")
-
-        # Template selection
+        st.markdown('<p class="column-label">Template</p>', unsafe_allow_html=True)
         templates_config = load_config("templates")
-        template_options = list(TEMPLATES.keys())
 
-        # Format template names for display
-        template_display = {
-            t: templates_config['templates'][t]['name']
-            for t in template_options
-        }
+        for t in TEMPLATES.keys():
+            t_info = templates_config['templates'][t]
+            t_icon = TEMPLATE_ICONS.get(t, "file")
+            is_sel = st.session_state.selected_template == t
+            cls = "tpl-card--active" if is_sel else ""
+            check = get_icon("check", 10) if is_sel else ""
 
-        selected = st.radio(
-            "Choose a template:",
-            template_options,
-            format_func=lambda x: template_display.get(x, x),
-            index=template_options.index(st.session_state.selected_template) if st.session_state.selected_template in template_options else 0,
-            help="Select the type of report that best matches your data"
-        )
-        st.session_state.selected_template = selected
+            render_html_block(f"""
+            <div class="tpl-card {cls}">
+                <div class="tpl-card__icon">{get_icon(t_icon, 18)}</div>
+                <div class="tpl-card__body">
+                    <div class="tpl-card__name">{t_info['name']}</div>
+                    <div class="tpl-card__info">{t_info.get('description', '')}</div>
+                </div>
+                <div class="tpl-card__check">{check}</div>
+            </div>
+            """)
 
-        # Template description
-        template_info = templates_config['templates'].get(selected, {})
-        st.markdown(f"**Description:** {template_info.get('description', 'N/A')}")
-
-        # Required columns info
-        required = template_info.get('required_columns', {})
-        st.markdown("**Required columns:**")
-        for field, info in required.items():
-            st.markdown(f"- {field.replace('_', ' ').title()}: {info.get('type', 'any')}")
+            if st.button("Select" if not is_sel else "Selected", key=f"sel_{t}", type="primary" if is_sel else "secondary", use_container_width=True, disabled=is_sel):
+                st.session_state.selected_template = t
+                st.rerun()
 
     with col2:
-        st.markdown("#### Column Mapping")
-        st.markdown("Map your data columns to the template fields:")
+        st.markdown('<p class="column-label">Column Mapping</p>', unsafe_allow_html=True)
 
-        # Set template and auto-map
-        processor.set_template(selected)
-        processor.auto_map_columns()
+        if st.session_state.selected_template:
+            processor.set_template(st.session_state.selected_template)
+            processor.auto_map_columns()
 
-        # Get column mapping
-        template_config = templates_config['templates'].get(selected, {})
-        all_fields = list(template_config.get('required_columns', {}).keys()) + list(template_config.get('optional_columns', {}).keys())
+            template_config = templates_config['templates'].get(st.session_state.selected_template, {})
+            required = list(template_config.get('required_columns', {}).keys())
+            optional = list(template_config.get('optional_columns', {}).keys())
 
-        column_mapping = {}
-        data_columns = ['(None)'] + list(processor.df.columns)
+            mapping = {}
+            cols = ['(None)'] + list(processor.df.columns)
 
-        for field in all_fields:
-            is_required = field in template_config.get('required_columns', {})
-            current_mapping = processor.column_mapping.get(field)
-            default_idx = data_columns.index(current_mapping) if current_mapping in data_columns else 0
+            with st.expander(f"Required ({len(required)})", expanded=True):
+                for field in required:
+                    current = processor.column_mapping.get(field)
+                    idx = cols.index(current) if current in cols else 0
+                    st.markdown(f'<div class="field-row"><span class="field-row__dot field-row__dot--req"></span><span class="field-row__name">{field.replace("_", " ").title()}</span></div>', unsafe_allow_html=True)
+                    sel = st.selectbox(field, cols, index=idx, key=f"m_{field}", label_visibility="collapsed")
+                    if sel != '(None)':
+                        mapping[field] = sel
 
-            label = f"{field.replace('_', ' ').title()}"
-            if is_required:
-                label += " *"
+            if optional:
+                with st.expander(f"Optional ({len(optional)})"):
+                    for field in optional:
+                        current = processor.column_mapping.get(field)
+                        idx = cols.index(current) if current in cols else 0
+                        st.markdown(f'<div class="field-row"><span class="field-row__dot field-row__dot--opt"></span><span class="field-row__name">{field.replace("_", " ").title()}</span></div>', unsafe_allow_html=True)
+                        sel = st.selectbox(field, cols, index=idx, key=f"m_{field}", label_visibility="collapsed")
+                        if sel != '(None)':
+                            mapping[field] = sel
 
-            selected_col = st.selectbox(
-                label,
-                data_columns,
-                index=default_idx,
-                key=f"map_{field}"
-            )
+            st.session_state.column_mapping = mapping
+            processor.set_column_mapping(mapping)
+            is_valid, errors, warnings = processor.validate_mapping()
 
-            if selected_col != '(None)':
-                column_mapping[field] = selected_col
+            if errors:
+                for e in errors:
+                    render_alert("error", "Error", e)
+            if warnings:
+                for w in warnings:
+                    render_alert("warning", "Warning", w)
+            if is_valid:
+                render_alert("success", "Valid", "All required fields mapped")
 
-        st.session_state.column_mapping = column_mapping
+    # Options and navigation in one row
+    opt1, opt2, nav_back, nav_next = st.columns([1, 1, 0.5, 0.5])
+    with opt1:
+        st.session_state.include_ai = st.checkbox("AI Insights", value=st.session_state.include_ai)
+    with opt2:
+        fmts = st.multiselect("Formats", ['pdf', 'docx'], default=st.session_state.output_formats, label_visibility="collapsed")
+        st.session_state.output_formats = fmts if fmts else ['pdf']
 
-        # Validate mapping
-        processor.set_column_mapping(column_mapping)
-        is_valid, errors, warnings = processor.validate_mapping()
-
-        if errors:
-            for error in errors:
-                st.error(f"{error}")
-
-        if warnings:
-            for warning in warnings:
-                st.warning(f"{warning}")
-
-        if is_valid:
-            st.success("Column mapping is valid!")
-
-    # Generation options
-    st.markdown("---")
-    st.markdown("#### Generation Options")
-
-    opt_col1, opt_col2 = st.columns(2)
-
-    with opt_col1:
-        st.session_state.include_ai = st.checkbox(
-            "Include AI-Generated Insights",
-            value=st.session_state.include_ai,
-            help="Generate intelligent insights using OpenRouter API (requires API key)"
-        )
-
-    with opt_col2:
-        format_options = st.multiselect(
-            "Output Formats",
-            ['pdf', 'docx'],
-            default=st.session_state.output_formats,
-            help="Select one or more output formats"
-        )
-        st.session_state.output_formats = format_options if format_options else ['pdf']
-
-    # Navigation buttons
-    st.markdown("---")
-    nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1])
-
-    with nav_col1:
-        if st.button("Back to Upload", use_container_width=True):
+    with nav_back:
+        if st.button("Back", use_container_width=True):
             st.session_state.step = 1
             st.rerun()
 
-    with nav_col3:
-        if is_valid and st.session_state.output_formats:
-            if st.button("Generate Report", type="primary", use_container_width=True):
-                st.session_state.step = 3
-                st.rerun()
-        else:
-            st.button("Generate Report", type="primary", use_container_width=True, disabled=True)
-            if not is_valid:
-                st.caption("Fix validation errors to continue")
-            elif not st.session_state.output_formats:
-                st.caption("Select at least one output format")
+    with nav_next:
+        can_gen = is_valid and st.session_state.output_formats
+        if st.button("Generate", type="primary", use_container_width=True, disabled=not can_gen):
+            st.session_state.step = 3
+            st.rerun()
 
 
-def render_step_3_generate():
-    """Render Step 3: Report Generation."""
-    st.markdown("### Step 3: Generating Report")
+# ============================================================================
+# STEP 3: GENERATE
+# ============================================================================
+
+def render_step_3():
+    """Step 3: Generate report."""
+    render_section("Generating", "Processing your data", "zap")
 
     if st.session_state.processor is None or st.session_state.selected_template is None:
-        st.warning("Please complete the previous steps first.")
+        render_alert("warning", "Missing config")
         if st.button("Start Over"):
             st.session_state.step = 1
             st.rerun()
         return
 
-    # Progress container
-    progress_bar = st.progress(0)
-    status_text = st.empty()
+    render_html_block(f"""
+    <div class="progress-box">
+        <div class="progress-box__icon">{get_icon('zap', 24)}</div>
+    </div>
+    """)
+
+    progress = st.progress(0)
+    status = st.empty()
 
     try:
-        # Get template class
-        template_class = get_template(st.session_state.selected_template)
-        template = template_class()
+        template = get_template(st.session_state.selected_template)()
 
-        # Create temp output directory
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            status_text.text("Processing data...")
-            progress_bar.progress(20)
+        with tempfile.TemporaryDirectory() as tmp:
+            status.markdown("**Processing data...**")
+            progress.progress(20)
 
-            status_text.text("Generating charts...")
-            progress_bar.progress(40)
+            data = st.session_state.df.copy()
+            if st.session_state.missing_value_strategy != 'none':
+                st.session_state.processor.df = data
+                data = st.session_state.processor.fill_missing_values(st.session_state.missing_value_strategy)
+
+            status.markdown("**Generating charts...**")
+            progress.progress(50)
 
             if st.session_state.include_ai:
-                status_text.text("Generating AI insights...")
-            progress_bar.progress(60)
+                status.markdown("**AI analysis...**")
+            progress.progress(75)
 
-            status_text.text("Building report...")
-            progress_bar.progress(80)
+            status.markdown("**Building report...**")
+            progress.progress(90)
 
-            # Generate the report
             output_files = template.generate(
-                data_source=st.session_state.df,
-                output_dir=tmp_dir,
+                data_source=data,
+                output_dir=tmp,
                 formats=st.session_state.output_formats,
                 include_ai_insights=st.session_state.include_ai,
                 column_mapping=st.session_state.column_mapping,
             )
 
-            progress_bar.progress(100)
-            status_text.text("Report generated successfully!")
+            progress.progress(100)
+            status.markdown("**Done!**")
 
-            # Read generated files into memory
-            generated_reports = {}
-            for fmt, filepath in output_files.items():
-                with open(filepath, 'rb') as f:
-                    generated_reports[fmt] = {
-                        'data': f.read(),
-                        'filename': Path(filepath).name,
-                    }
+            reports = {}
+            for fmt, path in output_files.items():
+                with open(path, 'rb') as f:
+                    reports[fmt] = {'data': f.read(), 'filename': Path(path).name}
 
-            st.session_state.generated_reports = generated_reports
-
-            # Auto-advance to download step
+            st.session_state.generated_reports = reports
             st.session_state.step = 4
             st.rerun()
 
     except Exception as e:
-        progress_bar.empty()
-        status_text.empty()
-        st.error(f"Error generating report: {str(e)}")
-        st.markdown("""
-        **Troubleshooting tips:**
-        - Check that your column mapping is correct
-        - Ensure your data doesn't have too many missing values
-        - Try disabling AI insights if you don't have an API key
-        """)
-
-        if st.button("Back to Configuration"):
+        progress.empty()
+        status.empty()
+        render_alert("error", "Error", str(e))
+        if st.button("Back"):
             st.session_state.step = 2
             st.rerun()
 
 
-def render_step_4_download():
-    """Render Step 4: Download Reports."""
-    st.markdown("### Step 4: Download Your Reports")
+# ============================================================================
+# STEP 4: DOWNLOAD
+# ============================================================================
+
+def render_step_4():
+    """Step 4: Download reports."""
+    render_section("Reports Ready", "Download your files", "download")
 
     if not st.session_state.generated_reports:
-        st.warning("No reports have been generated yet.")
+        render_alert("warning", "No reports")
         if st.button("Start Over"):
             st.session_state.step = 1
             st.rerun()
         return
 
-    st.success("Your reports are ready for download!")
+    render_alert("success", "Success!", "Your reports are ready")
+    st.markdown("---")
 
-    # Display download options
-    col1, col2 = st.columns(2)
+    cols = st.columns(len(st.session_state.generated_reports))
+    for i, (fmt, data) in enumerate(st.session_state.generated_reports.items()):
+        with cols[i]:
+            size = len(data['data']) / 1024
+            icon = FILE_ICONS.get(fmt, "file")
+            icon_cls = f"dl-card__icon--{fmt}"
 
-    for i, (fmt, report_data) in enumerate(st.session_state.generated_reports.items()):
-        col = col1 if i % 2 == 0 else col2
+            render_html_block(f"""
+            <div class="dl-card">
+                <div class="dl-card__icon {icon_cls}">{get_icon(icon, 18)}</div>
+                <div class="dl-card__body">
+                    <div class="dl-card__name">{fmt.upper()} Report</div>
+                    <div class="dl-card__meta">{data['filename']} • {size:.1f} KB</div>
+                </div>
+            </div>
+            """)
 
-        with col:
-            st.markdown(f"#### {fmt.upper()} Report")
-
-            # File info
-            file_size = len(report_data['data']) / 1024  # KB
-            st.markdown(f"**Filename:** {report_data['filename']}")
-            st.markdown(f"**Size:** {file_size:.1f} KB")
-
-            # Download button
             st.download_button(
-                label=f"Download {fmt.upper()}",
-                data=report_data['data'],
-                file_name=report_data['filename'],
+                f"Download {fmt.upper()}",
+                data=data['data'],
+                file_name=data['filename'],
                 mime='application/pdf' if fmt == 'pdf' else 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 use_container_width=True,
             )
 
-            # PDF Preview (only for PDF)
             if fmt == 'pdf':
-                with st.expander("Preview PDF"):
-                    # Convert to base64 for iframe display
-                    b64 = base64.b64encode(report_data['data']).decode()
-                    pdf_display = f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="600" type="application/pdf"></iframe>'
-                    st.markdown(pdf_display, unsafe_allow_html=True)
+                with st.expander("Preview"):
+                    b64 = base64.b64encode(data['data']).decode()
+                    st.markdown(f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="300" style="border-radius: 8px; border: 1px solid #e5e7eb;"></iframe>', unsafe_allow_html=True)
 
     # Summary
     st.markdown("---")
-    st.markdown("### Report Summary")
+    render_section("Summary", "", "chart-pie")
 
-    summary_col1, summary_col2, summary_col3, summary_col4 = st.columns(4)
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        render_metric("Template", st.session_state.selected_template.replace('_', ' ').title(), TEMPLATE_ICONS.get(st.session_state.selected_template, "file"))
+    with m2:
+        render_metric("Rows", f"{len(st.session_state.df):,}", "database")
+    with m3:
+        render_metric("Formats", " + ".join(f.upper() for f in st.session_state.output_formats), "file")
+    with m4:
+        render_metric("AI", "Yes" if st.session_state.include_ai else "No", "sparkles")
 
-    with summary_col1:
-        st.metric("Template", st.session_state.selected_template.replace('_', ' ').title())
-
-    with summary_col2:
-        st.metric("Data Rows", f"{len(st.session_state.df):,}")
-
-    with summary_col3:
-        st.metric("Formats", ", ".join(f.upper() for f in st.session_state.output_formats))
-
-    with summary_col4:
-        st.metric("AI Insights", "Yes" if st.session_state.include_ai else "No")
-
-    # Start over button
+    # New report
     st.markdown("---")
-    if st.button("Generate Another Report", type="primary", use_container_width=True):
-        # Reset session state
-        st.session_state.step = 1
-        st.session_state.uploaded_file = None
-        st.session_state.df = None
-        st.session_state.processor = None
-        st.session_state.selected_template = None
-        st.session_state.column_mapping = {}
-        st.session_state.generated_reports = {}
-        st.rerun()
+    _, btn, _ = st.columns([1, 2, 1])
+    with btn:
+        if st.button("New Report", type="primary", use_container_width=True):
+            for key in ['step', 'uploaded_file', 'df', 'processor', 'selected_template', 'column_mapping', 'generated_reports']:
+                st.session_state[key] = None if key != 'step' else 1
+            st.session_state.column_mapping = {}
+            st.session_state.generated_reports = {}
+            st.rerun()
 
+
+# ============================================================================
+# FOOTER
+# ============================================================================
+
+def render_footer():
+    """Render footer."""
+    render_html_block(f"""
+    <div class="app-footer">
+        <div class="app-footer__brand">
+            {get_icon('chart-bar', 12)}
+            <span>Report Generator v1.0</span>
+        </div>
+        <p>Built with Streamlit • AI-Powered</p>
+    </div>
+    """)
+
+
+# ============================================================================
+# MAIN
+# ============================================================================
 
 def main():
-    """Main application entry point."""
+    """Main entry point."""
     init_session_state()
-    render_header()
-    render_step_indicator()
-
-    # Render current step
+    
+    # Render landing sections for step 1 (upload)
     if st.session_state.step == 1:
-        render_step_1_upload()
-    elif st.session_state.step == 2:
-        render_step_2_configure()
-    elif st.session_state.step == 3:
-        render_step_3_generate()
-    elif st.session_state.step == 4:
-        render_step_4_download()
+        render_landing_hero()
+        render_bento_grid()
+        render_cta_strip()
+    
+    render_header()
+    render_steps()
 
-    # Footer
-    st.markdown("---")
-    st.markdown(
-        "<p style='text-align: center; color: #888; font-size: 0.9rem;'>"
-        "Automated Report Generator v1.0 | Built with Streamlit and OpenRouter AI"
-        "</p>",
-        unsafe_allow_html=True
-    )
+    if st.session_state.step == 1:
+        render_step_1()
+    elif st.session_state.step == 2:
+        render_step_2()
+    elif st.session_state.step == 3:
+        render_step_3()
+    elif st.session_state.step == 4:
+        render_step_4()
+
+    render_footer()
 
 
 if __name__ == "__main__":

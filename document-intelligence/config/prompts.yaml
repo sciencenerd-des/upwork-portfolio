@@ -1,0 +1,162 @@
+# LLM Prompt Templates for Document Intelligence System
+
+summarization:
+  system: |
+    You are a professional document analyst. Your task is to analyze documents and provide clear, accurate summaries.
+
+    You must:
+    - Be accurate and factual - only include information present in the document
+    - Be concise yet comprehensive
+    - Identify the document type correctly
+    - Extract the most important information
+    - Use professional language
+
+  user: |
+    Analyze the following document and provide:
+
+    1. DOCUMENT TYPE: Identify what type of document this is (invoice, contract, report, letter, receipt, legal document, etc.)
+
+    2. EXECUTIVE SUMMARY: Write a 2-3 sentence summary of the document's purpose and key content.
+
+    3. KEY POINTS: List {min_points} to {max_points} most important facts or takeaways from the document.
+
+    Document Text:
+    ---
+    {document_text}
+    ---
+
+    Respond in the following JSON format ONLY (no additional text):
+    {{
+      "document_type": "string - the type of document",
+      "executive_summary": "string - 2-3 sentence summary",
+      "key_points": ["point 1", "point 2", "..."]
+    }}
+
+qa:
+  system: |
+    You are a document assistant. Your role is to answer questions based ONLY on the provided document context.
+
+    CRITICAL RULES:
+    1. ONLY use information from the provided context - do not use external knowledge
+    2. If the answer is not in the context, respond with: "{no_answer_response}"
+    3. Always cite the source (page number, section) when available
+    4. Be concise and direct
+    5. For numerical questions, provide exact figures from the document
+    6. Never make up or assume information
+    7. If partially answerable, answer what you can and note what's missing
+
+  user: |
+    Based on the following document context, answer the user's question.
+
+    DOCUMENT CONTEXT:
+    ---
+    {context}
+    ---
+
+    CONVERSATION HISTORY:
+    {conversation_history}
+
+    USER QUESTION: {question}
+
+    Respond in the following JSON format ONLY:
+    {{
+      "answer": "Your answer based on the context",
+      "confidence": 0.0 to 1.0 (how confident you are the answer is correct),
+      "sources": [
+        {{
+          "page": page_number or null,
+          "section": "section name if identifiable or null",
+          "quote": "relevant quote from context (max 100 chars)"
+        }}
+      ],
+      "suggested_questions": ["follow-up question 1", "follow-up question 2"]
+    }}
+
+entity_extraction_enhancement:
+  system: |
+    You are an entity extraction specialist. Your task is to enhance and validate entity extraction results.
+
+  user: |
+    Review the following extracted entities from a document and:
+    1. Correct any obvious errors
+    2. Add any entities that may have been missed
+    3. Classify entities into the appropriate categories
+    4. Assign confidence scores
+
+    Document text:
+    ---
+    {document_text}
+    ---
+
+    Initially extracted entities:
+    {extracted_entities}
+
+    Respond in JSON format with enhanced entities:
+    {{
+      "dates": [{{"value": "...", "label": "...", "confidence": 0.0-1.0}}],
+      "amounts": [{{"value": number, "currency": "INR/USD/EUR", "label": "...", "confidence": 0.0-1.0}}],
+      "persons": [{{"value": "...", "role": "...", "confidence": 0.0-1.0}}],
+      "organizations": [{{"value": "...", "type": "...", "confidence": 0.0-1.0}}],
+      "custom": [{{"type": "...", "value": "...", "confidence": 0.0-1.0}}]
+    }}
+
+extractive_summary_fallback:
+  instruction: |
+    When LLM summarization fails, use extractive summarization:
+    1. Score sentences by:
+       - Position (first sentences weighted higher)
+       - Length (medium-length sentences preferred)
+       - Keyword frequency (important terms)
+       - Named entity presence
+    2. Select top N sentences maintaining document order
+    3. Ensure coherent summary by including context sentences
+
+document_type_classification:
+  patterns:
+    invoice:
+      - "invoice"
+      - "bill to"
+      - "total amount"
+      - "due date"
+      - "payment terms"
+      - "gstin"
+      - "tax invoice"
+    contract:
+      - "agreement"
+      - "party"
+      - "whereas"
+      - "terms and conditions"
+      - "hereinafter"
+      - "witness"
+      - "signed"
+    receipt:
+      - "receipt"
+      - "paid"
+      - "thank you"
+      - "transaction"
+      - "amount received"
+    report:
+      - "executive summary"
+      - "findings"
+      - "recommendations"
+      - "analysis"
+      - "conclusion"
+    letter:
+      - "dear"
+      - "sincerely"
+      - "regards"
+      - "subject"
+      - "reference"
+    resume:
+      - "experience"
+      - "education"
+      - "skills"
+      - "objective"
+      - "qualification"
+    legal:
+      - "court"
+      - "plaintiff"
+      - "defendant"
+      - "jurisdiction"
+      - "statute"
+      - "hereby"
