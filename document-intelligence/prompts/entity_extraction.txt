@@ -1,0 +1,1 @@
+Extract dates, amounts, organizations, people, identifiers, phone numbers, and emails from the document text.
