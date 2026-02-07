@@ -11,6 +11,14 @@ Extract entities, summaries, and answers from PDFs and images using OCR + NLP + 
 
 No fixed layouts, no custom parser per client format, no brittle regex-only pipeline.
 
+## Live Endpoints
+
+| Surface | URL |
+|---|---|
+| UI | `https://document-intelligence-ui.streamlit.app` |
+| API | `https://document-intelligence-api.onrender.com` |
+| API Docs | `https://document-intelligence-api.onrender.com/docs` |
+
 ## Screenshot Gallery
 
 | Upload + OCR | Entity Extraction |

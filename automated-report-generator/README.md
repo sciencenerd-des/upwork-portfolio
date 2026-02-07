@@ -15,6 +15,12 @@ Instead of manually cleaning data, building charts, formatting slides, and writi
 - Streamlit deployment for instant browser-based demos and client walkthroughs
 - Upwork portfolio showcasing automation, reporting, and AI-assisted analysis
 
+## Live Deployment
+
+- App URL: `https://automated-report-generator.streamlit.app`
+- Platform: Streamlit Cloud
+- Demo intent: Upload sample CSV and generate PDF/DOCX in under a minute
+
 ## Screenshot Gallery
 
 | Upload & Validation | Template + Mapping |

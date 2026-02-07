@@ -30,6 +30,12 @@ If you want to evaluate the product without configuring WorkOS:
 
 This is the fastest path for recruiters/clients to review UX and interaction quality.
 
+### Suggested Demo Tour
+
+1. Open dashboard and review project/task summary cards
+2. Switch to Kanban and drag a task across columns
+3. Open a task detail panel and inspect due date/priority metadata
+
 ## Features
 
 - Kanban + list task workflows
