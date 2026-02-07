@@ -1,210 +1,177 @@
 # Automated Report Generator
 
-Transform raw CSV/Excel data into professionally formatted PDF and Word reports with AI-powered insights.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit-green?logo=streamlit)](https://automated-report-generator.streamlit.app)
 
-## Features
+Transform raw CSV/Excel files into polished PDF and Word reports with charts, summaries, and optional AI commentary.
 
-- **Multiple Report Templates**: Sales, Financial, and Inventory reports
-- **Smart Column Mapping**: Auto-detects and maps data columns to template fields
-- **Professional Charts**: Line trends, bar charts, and pie charts with consistent styling
-- **AI-Generated Insights**: Claude AI analyzes your data and provides actionable insights
-- **Multiple Export Formats**: Generate PDF and/or Word documents
-- **User-Friendly Interface**: Step-by-step wizard with progress indicators
+## Value Proposition
 
-## Quick Start
+**Turns 4 hours of manual Excel work into 30 seconds.**
 
-### Prerequisites
+Instead of manually cleaning data, building charts, formatting slides, and writing summaries, upload your file and generate executive-ready reports in one flow.
+
+## Featured On
+
+- Streamlit deployment for instant browser-based demos and client walkthroughs
+- Upwork portfolio showcasing automation, reporting, and AI-assisted analysis
+
+## Screenshot Gallery
+
+| Upload & Validation | Template + Mapping |
+|---|---|
+| ![Upload Step](https://placehold.co/1200x700/0f172a/ffffff?text=Upload+CSV%2FXLSX+%7C+Validation+Preview) | ![Template and Mapping](https://placehold.co/1200x700/1d4ed8/ffffff?text=Template+Selection+%2B+Smart+Column+Mapping) |
+
+| Report Generation | PDF Preview | Word Export |
+|---|---|---|
+| ![Generate Report](https://placehold.co/1200x700/047857/ffffff?text=Generate+Report+in+Seconds) | ![PDF Preview](https://placehold.co/1200x700/7c2d12/ffffff?text=PDF+Preview+with+Charts+and+Insights) | ![Word Export](https://placehold.co/1200x700/7e22ce/ffffff?text=Download+DOCX+for+Client+Delivery) |
+
+## What It Does
+
+- Supports CSV and Excel uploads (`.csv`, `.xlsx`, `.xls`)
+- Auto-detects and maps columns to template fields
+- Generates line, bar, and pie charts with consistent styling
+- Produces professional PDF and Word reports
+- Adds optional AI insights through OpenRouter
+- Handles multi-file uploads and combines into one dataset
+
+## Crystal-Clear Setup
+
+### 1. Prerequisites
 
 - Python 3.9+
-- pip (Python package manager)
+- `pip`
 
-### Installation
-
-1. Clone the repository and navigate to the project directory:
+### 2. Install
 
 ```bash
-cd automated-report-generator
-```
+git clone https://github.com/sciencenerd-des/upwork-portfolio.git
+cd upwork-portfolio/automated-report-generator
 
-2. Create and activate a virtual environment:
+python -m venv .venv
+source .venv/bin/activate  # Windows (PowerShell): .venv\Scripts\Activate.ps1
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
 
-4. (Optional) Set up OpenRouter API for AI insights:
+### 3. (Optional) Enable AI Insights
 
 ```bash
 export OPENROUTER_API_KEY=your_api_key_here
+# Windows (PowerShell): $env:OPENROUTER_API_KEY="your_api_key_here"
 ```
 
-Get your API key from [OpenRouter](https://openrouter.ai/).
+Get a key from [OpenRouter](https://openrouter.ai/).
 
-### Running the Application
+### 4. Run
 
 ```bash
 streamlit run app.py
 ```
 
-The application will open in your browser at `http://localhost:8501`.
+Open `http://localhost:8501`.
 
-## Usage
+### 5. First Run Checklist
 
-### Step 1: Upload Data
+1. Upload `sample_data/sales_sample.csv`
+2. Pick `Sales Report`
+3. Keep auto-mapped columns
+4. Click `Generate Report`
+5. Download PDF and DOCX
 
-Upload one or more CSV/Excel files. The application supports:
-- CSV files (.csv)
-- Excel files (.xlsx, .xls)
-- **Multiple files** - automatically combined into a single dataset
-- Files up to 10MB each, 500,000 total rows
+## Usage Flow
 
-### Step 2: Configure Report
-
-1. **Select Template**: Choose from Sales, Financial, or Inventory templates
-2. **Map Columns**: The system auto-maps columns; adjust if needed
-3. **Generation Options**: Toggle AI insights and select output formats
-
-### Step 3: Generate Report
-
-Click "Generate Report" and wait for the progress bar to complete.
-
-### Step 4: Download
-
-Download your reports in PDF and/or Word format. Preview PDFs directly in the browser.
+1. Upload one or more files
+2. Select report type (Sales, Financial, Inventory)
+3. Review auto-mapped columns
+4. Toggle AI insights/output formats
+5. Generate and download reports
 
 ## Report Templates
 
 ### Sales Report
-
-Required columns: Date, Product, Revenue
-
-Includes:
-- Executive Summary (Total Revenue, Units Sold, Avg Order Value)
-- Revenue Trend Chart
-- Product Performance Chart
-- Regional Breakdown (if region data available)
-- Top Transactions Table
-- AI Insights
+Required: `Date`, `Product`, `Revenue`
 
 ### Financial Report
-
-Required columns: Date, Category, Amount, Transaction Type (Income/Expense)
-
-Includes:
-- Financial Overview (Income, Expenses, Net Profit, Margin)
-- Monthly Income vs Expenses Trend
-- Expense Breakdown Pie Chart
-- Income Sources Bar Chart
-- Month-over-Month Comparison Table
-- AI Insights
+Required: `Date`, `Category`, `Amount`, `Transaction Type`
 
 ### Inventory Report
+Required: `Product`, `Quantity`, `Reorder Level`, `Unit Cost`
 
-Required columns: Product, Quantity, Reorder Level, Unit Cost
+## Architecture Diagram (Text-Based)
 
-Includes:
-- Inventory Summary (Total SKUs, Units, Value, Items Below Reorder)
-- Stock Status by Category
-- Reorder Alerts Table
-- Value Distribution Chart
-- Top Items by Value Table
-- AI Insights
-
-## Sample Data
-
-Try the application with included sample data files:
-
-- `sample_data/sales_sample.csv` - 75 sales transactions
-- `sample_data/financial_sample.csv` - 75 financial records
-- `sample_data/inventory_sample.csv` - 60 inventory items
+```text
+┌──────────────────────────────┐
+│ Streamlit UI (app.py)        │
+│ - Upload                     │
+│ - Mapping                    │
+│ - Options                    │
+└──────────────┬───────────────┘
+               │
+               v
+┌──────────────────────────────┐
+│ Data Processor               │
+│ src/data_processor.py        │
+│ - load/merge/validate        │
+│ - infer column types         │
+└──────────────┬───────────────┘
+               │
+               ├─────────────┐
+               v             v
+┌─────────────────────┐   ┌─────────────────────┐
+│ Chart Generator     │   │ AI Insights         │
+│ src/chart_generator │   │ src/ai_insights.py  │
+│ - line/bar/pie      │   │ - OpenRouter (opt.) │
+└──────────┬──────────┘   └──────────┬──────────┘
+           └──────────────┬──────────┘
+                          v
+               ┌──────────────────────────┐
+               │ Report Builder           │
+               │ src/report_builder.py    │
+               │ - PDF (ReportLab)        │
+               │ - DOCX (python-docx)     │
+               └──────────┬───────────────┘
+                          v
+               ┌──────────────────────────┐
+               │ Download Artifacts       │
+               │ - *.pdf                  │
+               │ - *.docx                 │
+               └──────────────────────────┘
+```
 
 ## Project Structure
 
-```
+```text
 automated-report-generator/
-├── app.py                    # Streamlit web application
-├── requirements.txt          # Python dependencies
+├── app.py
+├── requirements.txt
 ├── config/
-│   ├── templates.yaml        # Template definitions
-│   └── styles.yaml           # Chart and report styles
-├── src/
-│   ├── __init__.py
-│   ├── data_processor.py     # Data loading and validation
-│   ├── chart_generator.py    # Chart creation
-│   ├── report_builder.py     # PDF and Word generation
-│   ├── ai_insights.py        # Claude AI integration
-│   └── utils.py              # Helper functions
-├── templates/
-│   ├── __init__.py           # Template registry
-│   ├── sales_report.py       # Sales report template
-│   ├── financial_report.py   # Financial report template
-│   └── inventory_report.py   # Inventory report template
+│   ├── templates.yaml
+│   └── styles.yaml
 ├── sample_data/
-│   ├── sales_sample.csv
-│   ├── financial_sample.csv
-│   └── inventory_sample.csv
+├── src/
+│   ├── data_processor.py
+│   ├── chart_generator.py
+│   ├── ai_insights.py
+│   └── report_builder.py
+├── templates/
 └── tests/
-    ├── test_data_processor.py
-    ├── test_chart_generator.py
-    ├── test_ai_insights.py
-    ├── test_report_builder.py
-    └── test_e2e.py
 ```
 
-## Running Tests
-
-Run all tests:
+## Tests
 
 ```bash
 python -m pytest tests/ -v
 ```
 
-Run specific test module:
+## Tech Stack
 
-```bash
-python -m pytest tests/test_e2e.py -v
-```
-
-## Configuration
-
-### Templates (config/templates.yaml)
-
-Define report templates with required/optional columns, aliases for auto-mapping, and section specifications.
-
-### Styles (config/styles.yaml)
-
-Customize colors, fonts, and styling for charts, PDFs, and Word documents.
-
-## Performance
-
-- Report generation: < 30 seconds for files up to 10,000 rows
-- File upload: < 5 seconds for 10MB files
-- Supports files up to 500,000 rows
-
-## Technologies Used
-
-- **Streamlit** - Web interface
-- **Pandas** - Data processing
-- **Matplotlib/Seaborn** - Chart generation
-- **ReportLab** - PDF generation
-- **python-docx** - Word document generation
-- **OpenRouter API** - AI insights (optional)
+- Streamlit
+- Pandas
+- Matplotlib + Seaborn
+- ReportLab
+- python-docx
+- OpenRouter API (optional)
 
 ## License
 
-MIT License
-
-## Author
-
-Biswajit Mondal
-
----
-
-Built for Upwork Portfolio - Demonstrating Python automation, data processing, and AI integration capabilities.
+MIT
