@@ -7,6 +7,7 @@ Transform raw CSV/Excel files into polished PDF and Word reports with charts, su
 ## Value Proposition
 
 **Turns 4 hours of manual Excel work into 30 seconds.**
+**Turns4hoursofmanualExcelworkinto30seconds**
 
 Instead of manually cleaning data, building charts, formatting slides, and writing summaries, upload your file and generate executive-ready reports in one flow.
 
@@ -23,13 +24,17 @@ Instead of manually cleaning data, building charts, formatting slides, and writi
 
 ## Screenshot Gallery
 
-| Upload & Validation | Template + Mapping |
+| Data Upload Step | Column Mapping |
 |---|---|
-| ![Upload Step](https://placehold.co/1200x700/0f172a/ffffff?text=Upload+CSV%2FXLSX+%7C+Validation+Preview) | ![Template and Mapping](https://placehold.co/1200x700/1d4ed8/ffffff?text=Template+Selection+%2B+Smart+Column+Mapping) |
+| ![Data Upload](assets/screenshots/01-data-upload.png) | ![Column Mapping](assets/screenshots/02-column-mapping.png) |
 
-| Report Generation | PDF Preview | Word Export |
-|---|---|---|
-| ![Generate Report](https://placehold.co/1200x700/047857/ffffff?text=Generate+Report+in+Seconds) | ![PDF Preview](https://placehold.co/1200x700/7c2d12/ffffff?text=PDF+Preview+with+Charts+and+Insights) | ![Word Export](https://placehold.co/1200x700/7e22ce/ffffff?text=Download+DOCX+for+Client+Delivery) |
+| Report Generation | PDF Preview |
+|---|---|
+| ![Report Generation](assets/screenshots/03-report-generation.png) | ![PDF Preview](assets/screenshots/04-pdf-preview.png) |
+
+| AI Insights |
+|---|
+| ![AI Insights](assets/screenshots/05-ai-insights.png) |
 
 ## What It Does
 
