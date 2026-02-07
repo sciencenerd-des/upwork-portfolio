@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automated Report Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e223f;
+      --bg2: #173b6d;
+      --accent: #7cf2ff;
+      --warm: #f5c263;
+      --text: #f6fbff;
+      --soft: #c6dcff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      width: 1200px;
+      height: 675px;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 80%, rgba(124, 242, 255, 0.2), transparent 36%),
+        radial-gradient(circle at 90% 18%, rgba(245, 194, 99, 0.16), transparent 34%),
+        linear-gradient(135deg, var(--bg), var(--bg2));
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 28px;
+      padding: 44px;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 64px;
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+    }
+
+    .intro {
+      font-size: 27px;
+      color: var(--soft);
+      line-height: 1.36;
+      margin-bottom: 22px;
+      max-width: 720px;
+    }
+
+    .line {
+      font-size: 22px;
+      margin: 10px 0;
+      color: #f4fbff;
+    }
+
+    .line strong {
+      color: var(--accent);
+    }
+
+    .stats {
+      display: grid;
+      gap: 14px;
+      align-content: center;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .box b {
+      display: block;
+      font-size: 40px;
+      color: var(--warm);
+      margin-bottom: 6px;
+    }
+
+    .box span {
+      font-size: 18px;
+      color: var(--soft);
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+  <section>
+    <h1>Automated Report Generator</h1>
+    <p class="intro">Upload CSV files and generate executive-grade PDF or Word reports with AI commentary in under 30 seconds.</p>
+    <p class="line"><strong>Problem:</strong> Weekly reporting consumes 4+ manual hours per cycle.</p>
+    <p class="line"><strong>Solution:</strong> Template-driven automation with instant export.</p>
+    <p class="line"><strong>Tech:</strong> Python, Streamlit, Claude AI, ReportLab</p>
+  </section>
+
+  <aside class="stats">
+    <div class="box"><b>4 hrs -> 30 sec</b><span>Replaces manual Excel workflows with one-click generation.</span></div>
+    <div class="box"><b>3 Templates</b><span>Executive, operational, and detailed reporting formats.</span></div>
+    <div class="box"><b>Multi Export</b><span>PDF and DOCX output ready for stakeholder sharing.</span></div>
+  </aside>
+</body>
+</html>

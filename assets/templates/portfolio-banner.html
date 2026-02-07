@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Banner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-a: #0e1b3a;
+      --bg-b: #122d5a;
+      --accent: #45f0df;
+      --accent-2: #ffcf5b;
+      --text-main: #f7fbff;
+      --text-soft: #bdd7ff;
+      --panel: rgba(255, 255, 255, 0.09);
+      --border: rgba(255, 255, 255, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      width: 1600px;
+      height: 900px;
+      font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(69, 240, 223, 0.18), transparent 45%),
+        radial-gradient(circle at 90% 80%, rgba(255, 207, 91, 0.2), transparent 40%),
+        linear-gradient(125deg, var(--bg-a), var(--bg-b));
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(8px);
+      opacity: 0.45;
+    }
+
+    body::before {
+      width: 420px;
+      height: 420px;
+      background: var(--accent);
+      left: -120px;
+      top: 480px;
+    }
+
+    body::after {
+      width: 300px;
+      height: 300px;
+      background: var(--accent-2);
+      right: -80px;
+      top: -70px;
+    }
+
+    .layout {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1.35fr 0.9fr;
+      gap: 36px;
+      padding: 70px 84px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .headline {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .badge {
+      width: fit-content;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      font-size: 18px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 78px;
+      line-height: 1.03;
+      letter-spacing: 0.01em;
+    }
+
+    .sub {
+      margin: 0;
+      max-width: 840px;
+      color: var(--text-soft);
+      font-size: 34px;
+      line-height: 1.35;
+      font-weight: 500;
+    }
+
+    .panel {
+      align-self: center;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px);
+      padding: 34px;
+      display: grid;
+      gap: 16px;
+      box-shadow: 0 22px 60px rgba(4, 11, 27, 0.45);
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.2;
+      color: var(--accent-2);
+      font-weight: 700;
+    }
+
+    .metric {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 18px;
+      padding: 16px 18px;
+      background: rgba(11, 23, 52, 0.45);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 36px;
+      line-height: 1;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .metric span {
+      font-size: 19px;
+      color: var(--text-soft);
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+  <section class="layout">
+    <div class="headline">
+      <div class="badge">Portfolio Overview</div>
+      <h1>Biswajit Mondal</h1>
+      <p class="sub">Former Auditor turned automation specialist building practical AI systems for finance and operations teams.</p>
+      <p class="sub">Delivers tools that cut repetitive reporting and document workflows from hours to seconds.</p>
+    </div>
+
+    <aside class="panel">
+      <h2>Client-Focused Outcomes</h2>
+      <div class="metric">
+        <strong>10-20 hrs</strong>
+        <span>Saved weekly through process automation</span>
+      </div>
+      <div class="metric">
+        <strong>30 sec</strong>
+        <span>Report turnaround from CSV upload to export</span>
+      </div>
+      <div class="metric">
+        <strong>3 Products</strong>
+        <span>Production-ready projects spanning reporting, OCR, and real-time collaboration</span>
+      </div>
+    </aside>
+  </section>
+</body>
+</html>
