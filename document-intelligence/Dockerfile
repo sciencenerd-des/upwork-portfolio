@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
+# Download spaCy model for NLP processing
+RUN python -m spacy download en_core_web_sm
+
 COPY . .
 
 EXPOSE 8000 8501
