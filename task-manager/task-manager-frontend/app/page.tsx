@@ -1,22 +1,27 @@
 import Link from "next/link";
-import { ArrowRight, BriefcaseBusiness, KanbanSquare, Sparkles, Users } from "lucide-react";
-import { DEMO_MODE } from "@/lib/config";
+import { ArrowRight, BriefcaseBusiness, KanbanSquare, Layers, Sparkles, Target, Users } from "lucide-react";
+import { DemoModeBadge } from "@/components/ui/demo-badge";
 
 const highlights = [
   {
     icon: BriefcaseBusiness,
-    title: "Enterprise clarity",
-    description: "Portfolio-level project oversight with concise health and progress signals."
+    title: "Portfolio Clarity",
+    description: "Unified project oversight with health signals, progress tracking, and resource visibility across all workstreams."
   },
   {
     icon: KanbanSquare,
-    title: "Polished Kanban",
-    description: "Status-focused board with visual priority cues and smooth transitions."
+    title: "Visual Workflow",
+    description: "Intuitive Kanban with priority-driven design, status columns, and seamless task progression."
   },
   {
     icon: Users,
-    title: "Team-friendly",
-    description: "Clean ownership views that stay approachable for technical and non-technical teams."
+    title: "Team Alignment",
+    description: "Clear ownership, async-friendly updates, and accessible views for technical and business stakeholders alike."
+  },
+  {
+    icon: Target,
+    title: "Outcome Focused",
+    description: "Milestone tracking, deadline visibility, and progress analytics that keep delivery on target."
   }
 ];
 
@@ -25,21 +30,34 @@ export default function LandingPage() {
     <main className="landing-root">
       <section className="landing card">
         <div className="landing-copy animate-fade-in">
-          <span className="pill warm">Portfolio Demo Ready</span>
-          <h1 className="title-xl">Task management with enterprise discipline and friendly usability.</h1>
+          <div className="landing-header-row">
+            <span className="pill warm">Production-Ready Demo</span>
+            <DemoModeBadge />
+          </div>
+          <h1 className="title-xl">Project management that balances structure with speed.</h1>
           <p className="muted">
-            A modern task manager designed with Notion-level polish for teams that need structure without friction.
+            Northstar PM delivers enterprise-grade visibility with consumer-grade usability. 
+            Built for teams that need accountability without bureaucracy.
           </p>
           <div className="landing-cta-row">
             <Link className="button primary" href="/dashboard">
-              Open Dashboard
+              Explore Dashboard
               <ArrowRight size={16} />
             </Link>
             <Link className="button secondary" href="/login">
-              WorkOS Sign in
+              Sign In with WorkOS
             </Link>
           </div>
-          {DEMO_MODE ? <span className="pill">Demo mode active with sample project data</span> : null}
+          <div className="landing-meta">
+            <span className="chip">
+              <Layers size={12} />
+              Next.js 14 + Convex
+            </span>
+            <span className="chip">
+              <Sparkles size={12} />
+              Demo Mode Available
+            </span>
+          </div>
         </div>
         <div className="landing-grid">
           {highlights.map(({ icon: Icon, title, description }) => (
@@ -51,13 +69,6 @@ export default function LandingPage() {
               <p className="muted">{description}</p>
             </article>
           ))}
-          <article className="card accent-card animate-fade-in-up">
-            <div className="header-row">
-              <h2>Visual direction</h2>
-              <Sparkles size={18} />
-            </div>
-            <p className="muted">Navy foundation, indigo accents, warm details, rounded cards, and intentional motion.</p>
-          </article>
         </div>
       </section>
     </main>

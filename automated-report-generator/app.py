@@ -107,7 +107,7 @@ def render_header() -> None:
         <div class="hero-shell fade-in">
             <span class="hero-badge">Enterprise Professional</span>
             <h1>Automated Report Generator</h1>
-            <p>Turns 4 hours of manual Excel work into 30 seconds with reliable, executive-ready reporting.</p>
+            <p>Transform raw data into executive-ready reports instantly. Eliminate manual formatting and accelerate decision-making.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -152,7 +152,7 @@ def render_step_1_upload() -> None:
         """
         <div class="section-title fade-in">
             <h3>Step 1: Upload Your Data</h3>
-            <p>Upload one or more CSV/Excel files. Multiple files are merged into a single analysis-ready dataset.</p>
+            <p>Import your business data via CSV or Excel. Multiple files are automatically consolidated for unified analysis.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -255,10 +255,10 @@ def render_step_1_upload() -> None:
             st.markdown("#### Quick Start")
             st.markdown(
                 """
-                **Sample data available:**
-                - `sample_data/sales_sample.csv`
-                - `sample_data/financial_sample.csv`
-                - `sample_data/inventory_sample.csv`
+                **Sample datasets available:**
+                - Sales Performance — Revenue trends by product
+                - Financial Summary — Expense tracking and budgets
+                - Inventory Analysis — Stock levels and reorder points
                 """
             )
 
@@ -266,9 +266,8 @@ def render_step_1_upload() -> None:
             st.markdown(
                 """
                 - **CSV** and **Excel** (`.xlsx`, `.xls`)
-                - **Multiple files** can be combined
-                - **Max size:** 10MB per file
-                - **Max rows:** 500,000 total
+                - **Multiple files** automatically merged
+                - **Maximum:** 10MB per file, 500,000 rows total
                 """
             )
 
@@ -279,7 +278,7 @@ def render_step_2_configure() -> None:
         """
         <div class="section-title fade-in">
             <h3>Step 2: Configure Your Report</h3>
-            <p>Select a template, validate column mappings, and choose output options.</p>
+            <p>Choose a report template, verify field mappings, and select output preferences.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -325,8 +324,8 @@ def render_step_2_configure() -> None:
 
     with col2:
         with st.container(border=True):
-            st.markdown("#### Column Mapping")
-            st.markdown("Map your dataset fields to template inputs.")
+            st.markdown("#### Field Mapping")
+            st.markdown("Connect your data fields to report template requirements.")
 
             processor.set_template(selected)
             processor.auto_map_columns()
@@ -377,9 +376,9 @@ def render_step_2_configure() -> None:
         opt_col1, opt_col2 = st.columns(2)
         with opt_col1:
             st.session_state.include_ai = st.checkbox(
-                "Include AI-Generated Insights",
+                "Include Executive Insights",
                 value=st.session_state.include_ai,
-                help="Uses OpenRouter when configured; otherwise falls back to statistical insights.",
+                help="Add AI-powered commentary to highlight key findings and trends.",
             )
 
         with opt_col2:
@@ -417,8 +416,8 @@ def render_step_3_generate() -> None:
     st.markdown(
         """
         <div class="section-title fade-in">
-            <h3>Step 3: Generating Report</h3>
-            <p>Compiling analytics, charts, and narrative sections into professional output files.</p>
+            <h3>Step 3: Generating Your Report</h3>
+            <p>Compiling analytics, visualizations, and insights into professional deliverables.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -510,15 +509,15 @@ def render_step_3_generate() -> None:
 def render_ai_insights_panel() -> None:
     """Render AI insights preview panel in Step 4."""
     with st.container(border=True):
-        st.markdown("#### AI Insights")
+        st.markdown("#### Executive Insights")
 
         if not st.session_state.include_ai:
-            st.info("AI insights were disabled for this report run.")
+            st.info("AI-powered insights were not included in this report.")
             return
 
         insights = st.session_state.ai_insights_preview or []
         if not insights:
-            st.info("Insights were not available in this run. Add an OpenRouter API key for model-generated analysis.")
+            st.info("Insights are generated using statistical analysis. Configure an API key for AI-enhanced commentary.")
             return
 
         for idx, insight in enumerate(insights, start=1):
@@ -535,7 +534,7 @@ def render_step_4_download() -> None:
         """
         <div class="section-title fade-in">
             <h3>Step 4: Download and Review</h3>
-            <p>Your reports are generated. Download files, preview PDF output, and review AI highlights.</p>
+            <p>Your reports are ready. Download files, preview output, and review key insights.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -618,7 +617,7 @@ def main() -> None:
         render_step_4_download()
 
     st.markdown(
-        "<p class='app-footer'>Automated Report Generator v1.0 | Built with Streamlit and OpenRouter AI</p>",
+        "<p class='app-footer'>Automated Report Generator v1.0 | Built with Streamlit</p>",
         unsafe_allow_html=True,
     )
 

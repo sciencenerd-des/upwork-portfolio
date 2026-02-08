@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Iteration 3 - Coastal Cards</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;700&display=swap');
+
+    :root {
+      --sea-0: #eaf9f6;
+      --sea-1: #d8f2ed;
+      --sea-2: #88cec0;
+      --sea-3: #00786d;
+      --ink: #123438;
+      --muted: #3b6266;
+      --card: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 52, 56, 0.16);
+      --coral: #ff8864;
+      --foam: #f8fffd;
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Outfit", "Trebuchet MS", sans-serif;
+      background:
+        radial-gradient(circle at 10% 6%, rgba(255, 136, 100, 0.24), transparent 36%),
+        radial-gradient(circle at 94% 12%, rgba(136, 206, 192, 0.34), transparent 34%),
+        linear-gradient(180deg, #f6fffd 0%, var(--sea-0) 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto 56px;
+      position: relative;
+    }
+
+    .wave,
+    .wave.two {
+      position: absolute;
+      left: -6%;
+      right: -6%;
+      height: 160px;
+      pointer-events: none;
+      opacity: 0.48;
+      background: radial-gradient(120% 80px at 50% 0, rgba(136, 206, 192, 0.44), transparent 70%);
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .wave {
+      top: 310px;
+    }
+
+    .wave.two {
+      top: 565px;
+      animation-delay: 1.7s;
+      opacity: 0.36;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(150deg, rgba(255, 255, 255, 0.86), rgba(240, 255, 251, 0.8));
+      backdrop-filter: blur(6px);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 22px 50px rgba(24, 60, 70, 0.12);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 136, 100, 0.3), transparent 72%);
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #3f6467;
+    }
+
+    h1 {
+      margin: 10px 0 0;
+      font-family: "DM Serif Display", serif;
+      font-size: clamp(36px, 6vw, 68px);
+      line-height: 0.9;
+      max-width: 12ch;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      max-width: 63ch;
+      line-height: 1.55;
+    }
+
+    .hero-actions {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: 600 13px "Outfit", sans-serif;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(120deg, var(--sea-3), #0a9487);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(0, 120, 109, 0.34);
+    }
+
+    .btn.secondary {
+      background: #ffffff;
+      border-color: rgba(18, 52, 56, 0.18);
+      color: var(--ink);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid rgba(0, 120, 109, 0.35);
+      outline-offset: 2px;
+    }
+
+    .surface {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--card);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 12px 26px rgba(22, 64, 69, 0.1);
+      padding: 16px;
+      transition: transform 0.24s ease, box-shadow 0.24s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 26px rgba(22, 64, 69, 0.16);
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 23px;
+      font-family: "DM Serif Display", serif;
+      font-weight: 400;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid rgba(18, 52, 56, 0.2);
+      background: var(--foam);
+      white-space: nowrap;
+    }
+
+    .stream {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .node {
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 11px;
+      background: #fbfffe;
+      border: 1px solid rgba(0, 120, 109, 0.24);
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #3f666a;
+    }
+
+    select,
+    input[type="search"] {
+      width: 100%;
+      border: 1px solid rgba(18, 52, 56, 0.24);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+      font: 500 13px "Outfit", sans-serif;
+      color: var(--ink);
+    }
+
+    select:focus-visible,
+    input[type="search"]:focus-visible {
+      outline: none;
+      border-color: var(--sea-3);
+      box-shadow: 0 0 0 4px rgba(0, 120, 109, 0.2);
+    }
+
+    .fallback {
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 136, 100, 0.35);
+      background: rgba(255, 136, 100, 0.13);
+      color: #7a3c2b;
+      font-size: 12px;
+    }
+
+    .facts {
+      display: grid;
+      gap: 8px;
+    }
+
+    .fact {
+      border: 1px solid rgba(18, 52, 56, 0.18);
+      border-radius: 10px;
+      padding: 8px;
+      background: #fbfffe;
+      font-size: 13px;
+    }
+
+    .meter {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #d9f1ec;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: 92%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #35b8a8, var(--sea-3));
+    }
+
+    .board {
+      display: grid;
+      gap: 8px;
+    }
+
+    .lane {
+      border: 1px dashed rgba(18, 52, 56, 0.3);
+      border-radius: 10px;
+      padding: 8px;
+      background: #fcfffe;
+    }
+
+    .lane b {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #40686b;
+    }
+
+    .ticket {
+      border-left: 3px solid var(--coral);
+      border-radius: 8px;
+      padding: 6px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    .tide {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.82), rgba(243, 255, 252, 0.78));
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .tide-card {
+      border-radius: 12px;
+      border: 1px solid rgba(18, 52, 56, 0.2);
+      background: #fff;
+      padding: 10px;
+    }
+
+    .tide-card small {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 10px;
+      color: #4e7275;
+    }
+
+    .tide-card strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 24px;
+    }
+
+    @keyframes float {
+      50% {
+        transform: translateY(10px);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .surface {
+        grid-template-columns: 1fr;
+      }
+
+      .tide {
+        grid-template-columns: 1fr;
+      }
+
+      .wave,
+      .wave.two {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="wave" aria-hidden="true"></div>
+    <div class="wave two" aria-hidden="true"></div>
+
+    <section class="hero">
+      <p class="eyebrow">Iteration 03 - Coastal Cards</p>
+      <h1>Soft currents, sharp data.</h1>
+      <p>Coastal Cards introduces rounded surfaces, fluid spacing, and calm color transitions so operators can process dense information without visual fatigue.</p>
+      <div class="hero-actions">
+        <button class="btn primary" type="button">Simulate Daily Run</button>
+        <button class="btn secondary" type="button">View Extraction Drift</button>
+      </div>
+    </section>
+
+    <section class="surface">
+      <article class="card">
+        <h2>Report Generator <span class="pill">Flow</span></h2>
+        <div class="stream">
+          <span class="node">Upload</span>
+          <span class="node">Normalize</span>
+          <span class="node">Narrate</span>
+          <span class="node">Export</span>
+        </div>
+        <div class="field">
+          <label for="coastal-strategy">Missing value strategy</label>
+          <select id="coastal-strategy">
+            <option>Keep as-is</option>
+            <option>Drop incomplete rows</option>
+            <option>Fill with zero</option>
+            <option>Fill with mean</option>
+            <option>Forward fill</option>
+          </select>
+        </div>
+        <div class="fallback">Fallback narrative used for 3 charts because the model route timed out.</div>
+      </article>
+
+      <article class="card">
+        <h2>Document Intelligence <span class="pill">Entities</span></h2>
+        <div class="field">
+          <label for="entity-search">Search extracted entities</label>
+          <input id="entity-search" type="search" placeholder="Invoice, amount, due date..." />
+        </div>
+        <div class="facts">
+          <div class="fact">Invoice Number: INV-2026-448</div>
+          <div class="fact">Vendor Tax ID: US-44-81072</div>
+          <div class="fact">Total Amount: USD 8,120.25</div>
+        </div>
+        <div class="meter">
+          <small>Confidence level</small>
+          <div class="bar"><span aria-hidden="true"></span></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Task Manager <span class="pill">Board</span></h2>
+        <div class="board">
+          <div class="lane"><b>Todo</b><div class="ticket">Color-system QA in Safari</div></div>
+          <div class="lane"><b>In Progress</b><div class="ticket">Compact list-mode density toggle</div></div>
+          <div class="lane"><b>Done</b><div class="ticket">Polished drag placeholder visuals</div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="tide" aria-label="Daily tide metrics">
+      <article class="tide-card">
+        <small>Reports Generated</small>
+        <strong>214</strong>
+      </article>
+      <article class="tide-card">
+        <small>Documents Processed</small>
+        <strong>3,807</strong>
+      </article>
+      <article class="tide-card">
+        <small>Tasks Closed</small>
+        <strong>96</strong>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

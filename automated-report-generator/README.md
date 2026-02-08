@@ -4,35 +4,55 @@
 
 Transform raw CSV/Excel files into polished PDF and Word reports with charts, summaries, and optional AI commentary.
 
-## Value Proposition
+## The Business Problem
 
-**Turns 4 hours of manual Excel work into 30 seconds.**
+**Manual reporting is expensive.**
 
-Instead of manually cleaning data, building charts, formatting slides, and writing summaries, upload your file and generate executive-ready reports in one flow.
+Business analysts spend 4+ hours per report cleaning data, building charts, formatting documents, and writing executive summaries. This repetitive work delays decisions, introduces errors, and pulls talent away from strategic analysis.
 
-## Featured On
+**Our solution:** Upload your data and generate executive-ready reports in 30 seconds.
 
-- Streamlit deployment for instant browser-based demos and client walkthroughs
-- Upwork portfolio showcasing automation, reporting, and AI-assisted analysis
+## Who Uses This
+
+- **Sales Operations** — Weekly pipeline reports, territory performance summaries
+- **Financial Analysts** — P&L statements, expense tracking, budget variance reports
+- **Inventory Managers** — Stock level analysis, reorder alerts, cost summaries
+- **Consultants** — Client-ready deliverables without the manual formatting
+
+## Try the Demo
+
+Experience the report generator instantly—no signup required.
+
+**Live Demo:** https://automated-report-generator.streamlit.app
+
+### Quick Start with Sample Data
+
+1. Visit the demo link above
+2. Download a sample file:
+   - [Sales Sample](sample_data/sales_sample.csv) — Revenue trends by product
+   - [Financial Sample](sample_data/financial_sample.csv) — Expense tracking
+   - [Inventory Sample](sample_data/inventory_sample.csv) — Stock levels and costs
+3. Upload to the app
+4. Select matching report template
+5. Click **Generate Report**
+6. Download your PDF and Word documents
+
+*No data is stored. Files are processed in memory and deleted immediately after report generation.*
 
 ## Screenshot Gallery
 
-| Upload & Validation | Template + Mapping |
-|---|---|
-| ![Upload Step](https://placehold.co/1200x700/0f172a/ffffff?text=Upload+CSV%2FXLSX+%7C+Validation+Preview) | ![Template and Mapping](https://placehold.co/1200x700/1d4ed8/ffffff?text=Template+Selection+%2B+Smart+Column+Mapping) |
-
-| Report Generation | PDF Preview | Word Export |
+| Upload & Validation | Column Mapping | Report Generation |
 |---|---|---|
-| ![Generate Report](https://placehold.co/1200x700/047857/ffffff?text=Generate+Report+in+Seconds) | ![PDF Preview](https://placehold.co/1200x700/7c2d12/ffffff?text=PDF+Preview+with+Charts+and+Insights) | ![Word Export](https://placehold.co/1200x700/7e22ce/ffffff?text=Download+DOCX+for+Client+Delivery) |
+| ![Upload Step](assets/screenshots/01-data-upload.png) | ![Template and Mapping](assets/screenshots/02-column-mapping.png) | ![Generate Report](assets/screenshots/03-report-generation.png) |
 
 ## What It Does
 
-- Supports CSV and Excel uploads (`.csv`, `.xlsx`, `.xls`)
-- Auto-detects and maps columns to template fields
-- Generates line, bar, and pie charts with consistent styling
-- Produces professional PDF and Word reports
-- Adds optional AI insights through OpenRouter
-- Handles multi-file uploads and combines into one dataset
+- **Multi-format support** — CSV and Excel uploads (`.csv`, `.xlsx`, `.xls`)
+- **Intelligent mapping** — Auto-detects and maps columns to template fields
+- **Professional visualizations** — Line, bar, and pie charts with consistent styling
+- **Executive deliverables** — PDF and Word reports ready for client presentation
+- **Smart insights** — Optional AI-powered commentary on your data
+- **Batch processing** — Combine multiple files into unified reports
 
 ## Crystal-Clear Setup
 
@@ -89,15 +109,29 @@ Open `http://localhost:8501`.
 ## Report Templates
 
 ### Sales Report
-Required: `Date`, `Product`, `Revenue`
+**Best for:** Revenue tracking, product performance, sales team metrics
+
+**Required columns:** `Date`, `Product`, `Revenue`
 
 ### Financial Report
-Required: `Date`, `Category`, `Amount`, `Transaction Type`
+**Best for:** Expense management, budget tracking, financial summaries
+
+**Required columns:** `Date`, `Category`, `Amount`, `Transaction Type`
 
 ### Inventory Report
-Required: `Product`, `Quantity`, `Reorder Level`, `Unit Cost`
+**Best for:** Stock management, reorder planning, cost analysis
 
-## Architecture Diagram (Text-Based)
+**Required columns:** `Product`, `Quantity`, `Reorder Level`, `Unit Cost`
+
+## Trust & Security
+
+- **No data persistence** — Files are processed in memory only
+- **No external storage** — Your data never leaves the session
+- **No tracking** — No analytics, cookies, or user identification
+- **Self-hostable** — Run entirely on your infrastructure
+- **Optional AI** — AI features only activate with your API key
+
+## Architecture Diagram
 
 ```text
 ┌──────────────────────────────┐

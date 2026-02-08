@@ -1,4 +1,4 @@
-import { FlaskConical } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { DEMO_MODE } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
@@ -8,9 +8,9 @@ export function DemoModeBadge({ compact = false }: { compact?: boolean }) {
   }
 
   return (
-    <span className={cn("demo-badge", compact && "compact")}>
-      <FlaskConical size={compact ? 12 : 14} />
-      DemoMode
+    <span className={cn("demo-badge", compact && "compact")} title="Try the app instantly with sample data">
+      <Sparkles size={compact ? 12 : 14} />
+      Live Demo • Sample Data
     </span>
   );
 }

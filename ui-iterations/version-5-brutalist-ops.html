@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Iteration 5 - Brutalist Ops</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Chivo+Mono:wght@400;600;700&display=swap');
+
+    :root {
+      --bg: #fff7ea;
+      --ink: #101010;
+      --paper: #ffffff;
+      --line: #101010;
+      --red: #f03448;
+      --blue: #00a8ff;
+      --lime: #77d11f;
+      --yellow: #ffd447;
+      --shadow: 8px 8px 0 #101010;
+      --shadow-sm: 5px 5px 0 #101010;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Chivo Mono", monospace;
+      background:
+        linear-gradient(45deg, rgba(240, 52, 72, 0.08) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(0, 168, 255, 0.08) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(119, 209, 31, 0.08) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 212, 71, 0.08) 75%),
+        var(--bg);
+      background-size: 32px 32px;
+      min-height: 100vh;
+    }
+
+    .poster {
+      width: min(1240px, calc(100% - 30px));
+      margin: 18px auto 40px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .mast {
+      position: relative;
+      border: 4px solid var(--line);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .mast::after {
+      content: "";
+      position: absolute;
+      right: -38px;
+      top: -26px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(240, 52, 72, 0.3), transparent 68%);
+      pointer-events: none;
+    }
+
+    .meta {
+      display: inline-block;
+      border: 3px solid var(--line);
+      padding: 4px 8px;
+      background: var(--line);
+      color: #ffffff;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: clamp(56px, 11vw, 148px);
+      letter-spacing: 0.02em;
+      line-height: 0.82;
+      max-width: 10.5ch;
+    }
+
+    .deck {
+      margin-top: 8px;
+      max-width: 64ch;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .strap {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      border: 3px solid var(--line);
+      background: var(--yellow);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      transform: rotate(-4deg);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .block {
+      border: 4px solid var(--line);
+      background: var(--paper);
+      padding: 14px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    .block:hover {
+      transform: translate(-2px, -2px);
+    }
+
+    .report {
+      grid-column: span 5;
+    }
+
+    .doc {
+      grid-column: span 4;
+    }
+
+    .tasks {
+      grid-column: span 3;
+    }
+
+    .strip {
+      position: absolute;
+      top: -14px;
+      left: 12px;
+      border: 3px solid var(--line);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .doc .strip {
+      background: var(--red);
+    }
+
+    .tasks .strip {
+      background: var(--lime);
+      color: #1a1a1a;
+    }
+
+    .block h2 {
+      margin: 10px 0 12px;
+      font-size: 21px;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .sequence {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .step {
+      border: 2px solid var(--line);
+      padding: 4px 8px;
+      font-size: 11px;
+      background: #fff;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 9px;
+    }
+
+    label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    select,
+    input,
+    button {
+      width: 100%;
+      border: 2px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 9px;
+      font: 500 12px "Chivo Mono", monospace;
+    }
+
+    select:focus-visible,
+    input:focus-visible,
+    button:focus-visible {
+      outline: 4px solid rgba(0, 168, 255, 0.28);
+      outline-offset: 1px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    button.primary {
+      background: var(--line);
+      color: #fff;
+    }
+
+    button.alert {
+      background: var(--red);
+      color: #fff;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .notice {
+      margin-top: 8px;
+      border: 2px solid var(--line);
+      padding: 8px;
+      background: #ffe4e8;
+      font-size: 12px;
+    }
+
+    .fact-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .fact {
+      border: 2px solid var(--line);
+      padding: 7px;
+      font-size: 12px;
+      background: #f7fbff;
+    }
+
+    .board {
+      display: grid;
+      gap: 7px;
+    }
+
+    .lane {
+      border: 2px dashed var(--line);
+      padding: 7px;
+      background: #fff;
+    }
+
+    .lane b {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .ticket {
+      border-left: 4px solid var(--blue);
+      padding: 6px;
+      font-size: 12px;
+      background: #f8fbff;
+    }
+
+    .bottom {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      border: 3px solid var(--line);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      padding: 10px;
+    }
+
+    .stat small {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 2px;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 44px;
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 1020px) {
+      .report,
+      .doc,
+      .tasks {
+        grid-column: 1 / -1;
+      }
+
+      .bottom {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .strap {
+        position: static;
+        transform: none;
+        width: fit-content;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <section class="mast">
+      <div class="meta">Iteration 05 // Brutalist Ops</div>
+      <h1>Move fast. Break visual symmetry.</h1>
+      <p class="deck">This direction leans into poster-like brutality with thick lines, offset shadows, and unapologetic labels to make operational actions impossible to miss.</p>
+      <div class="strap">Signal-first hierarchy</div>
+    </section>
+
+    <section class="grid">
+      <article class="block report">
+        <div class="strip">Report Flow</div>
+        <h2>Automated Report Generator</h2>
+        <div class="sequence">
+          <span class="step">INGEST</span>
+          <span class="step">MAP</span>
+          <span class="step">SYNTH</span>
+          <span class="step">SHIP</span>
+        </div>
+        <div class="field">
+          <label for="brutal-strategy">missing_value_strategy</label>
+          <select id="brutal-strategy">
+            <option>keep_as_is</option>
+            <option>drop_rows</option>
+            <option>fill_zero</option>
+            <option>fill_mean</option>
+          </select>
+        </div>
+        <div class="button-row">
+          <button class="primary" type="button">Execute Run</button>
+          <button class="alert" type="button">Force Fallback</button>
+        </div>
+        <div class="notice">Fallback warning triggered for 1 segment. Cached statistical profile injected.</div>
+      </article>
+
+      <article class="block doc">
+        <div class="strip">Extraction</div>
+        <h2>Document Intelligence</h2>
+        <div class="field">
+          <label for="query">Search entity key</label>
+          <input id="query" type="text" value="invoice_total" />
+        </div>
+        <div class="fact-list">
+          <div class="fact">invoice_id: INV-77230</div>
+          <div class="fact">issue_date: 2026-02-05</div>
+          <div class="fact">amount: USD 4,730.50</div>
+          <div class="fact">citation_source: page_3</div>
+        </div>
+      </article>
+
+      <article class="block tasks">
+        <div class="strip">Delivery</div>
+        <h2>Task Manager</h2>
+        <div class="board">
+          <div class="lane"><b>Todo</b><div class="ticket">Increase focus-contrast checks</div></div>
+          <div class="lane"><b>Doing</b><div class="ticket">Patch sidebar mobile snapping</div></div>
+          <div class="lane"><b>Done</b><div class="ticket">Launch card priority badges</div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="bottom" aria-label="Ops metrics">
+      <article class="stat"><small>Reports today</small><strong>172</strong></article>
+      <article class="stat"><small>Entities parsed</small><strong>4.1k</strong></article>
+      <article class="stat"><small>Fallback rate</small><strong>3.8%</strong></article>
+      <article class="stat"><small>Tasks shipped</small><strong>91%</strong></article>
+    </section>
+  </main>
+</body>
+</html>

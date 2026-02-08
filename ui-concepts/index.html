@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Concepts Gallery - 5 Design Directions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --border: #262626;
+            --text: #e5e5e5;
+            --muted: #737373;
+            --accent: #6366f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .concept-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.15);
+        }
+
+        .concept-preview {
+            height: 240px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .concept-preview iframe {
+            width: 200%;
+            height: 200%;
+            transform: scale(0.5);
+            transform-origin: top left;
+            border: none;
+            pointer-events: none;
+        }
+
+        .concept-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.8) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .concept-card:hover .concept-overlay {
+            opacity: 1;
+        }
+
+        .view-btn {
+            padding: 0.75rem 2rem;
+            background: white;
+            color: var(--bg);
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .concept-info {
+            padding: 1.5rem;
+        }
+
+        .concept-number {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .concept-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .concept-desc {
+            font-size: 0.9rem;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .concept-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.35rem 0.75rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .comparison-table {
+            margin-top: 4rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .comparison-table h2 {
+            padding: 1.5rem;
+            font-size: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            background: rgba(255,255,255,0.02);
+        }
+
+        td {
+            font-size: 0.9rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .concepts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .comparison-table {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>5 UI Design Directions</h1>
+            <p class="subtitle">Exploring different aesthetic approaches for the Upwork portfolio projects: Report Generator, Document Intelligence, and TaskFlow Manager.</p>
+        </header>
+
+        <div class="concepts-grid">
+            <article class="concept-card">
+                <div class="concept-preview">
+                    <iframe src="concept-1-minimalist-zen/index.html" loading="lazy"></iframe>
+                    <div class="concept-overlay">
+                        <a href="concept-1-minimalist-zen/index.html" class="view-btn">View Full Design</a>
+                    </div>
+                </div>
+                <div class="concept-info">
+                    <span class="concept-number">Concept 01</span>
+                    <h3 class="concept-title">Minimalist Zen</h3>
+                    <p class="concept-desc">Japanese minimalism meets Swiss design. Elegant typography, generous whitespace, and subtle gold accents create a refined, gallery-like experience.</p>
+                    <div class="concept-tags">
+                        <span class="tag">Serif Typography</span>
+                        <span class="tag">Warm Neutrals</span>
+                        <span class="tag">Subtle Motion</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="concept-card">
+                <div class="concept-preview">
+                    <iframe src="concept-2-bold-expressive/index.html" loading="lazy"></iframe>
+                    <div class="concept-overlay">
+                        <a href="concept-2-bold-expressive/index.html" class="view-btn">View Full Design</a>
+                    </div>
+                </div>
+                <div class="concept-info">
+                    <span class="concept-number">Concept 02</span>
+                    <h3 class="concept-title">Bold Expressive</h3>
+                    <p class="concept-desc">Neo-brutalism meets retro-futurism. Massive typography, neon yellow accents on black, grid backgrounds, and hover effects that demand attention.</p>
+                    <div class="concept-tags">
+                        <span class="tag">Bebas Neue</span>
+                        <span class="tag">Neon Yellow</span>
+                        <span class="tag">High Contrast</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="concept-card">
+                <div class="concept-preview">
+                    <iframe src="concept-3-data-focused/index.html" loading="lazy"></iframe>
+                    <div class="concept-overlay">
+                        <a href="concept-3-data-focused/index.html" class="view-btn">View Full Design</a>
+                    </div>
+                </div>
+                <div class="concept-info">
+                    <span class="concept-number">Concept 03</span>
+                    <h3 class="concept-title">Data-Focused Terminal</h3>
+                    <p class="concept-desc">Bloomberg Terminal meets modern dev tools. Information-dense, monospace typography, real-time data widgets, and keyboard-first navigation.</p>
+                    <div class="concept-tags">
+                        <span class="tag">JetBrains Mono</span>
+                        <span class="tag">Terminal Green</span>
+                        <span class="tag">Dashboard Layout</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="concept-card">
+                <div class="concept-preview">
+                    <iframe src="concept-4-playful-friendly/index.html" loading="lazy"></iframe>
+                    <div class="concept-overlay">
+                        <a href="concept-4-playful-friendly/index.html" class="view-btn">View Full Design</a>
+                    </div>
+                </div>
+                <div class="concept-info">
+                    <span class="concept-number">Concept 04</span>
+                    <h3 class="concept-title">Playful & Friendly</h3>
+                    <p class="concept-desc">Notion meets Figma with candy colors. Rounded corners, gradient blobs, bouncy animations, and emoji accents that make work feel fun.</p>
+                    <div class="concept-tags">
+                        <span class="tag">Nunito</span>
+                        <span class="tag">Candy Gradients</span>
+                        <span class="tag">Bouncy Motion</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="concept-card">
+                <div class="concept-preview">
+                    <iframe src="concept-5-enterprise-professional/index.html" loading="lazy"></iframe>
+                    <div class="concept-overlay">
+                        <a href="concept-5-enterprise-professional/index.html" class="view-btn">View Full Design</a>
+                    </div>
+                </div>
+                <div class="concept-info">
+                    <span class="concept-number">Concept 05</span>
+                    <h3 class="concept-title">Enterprise Professional</h3>
+                    <p class="concept-desc">Stripe meets Linear. Sophisticated navy palette, elegant serif headlines, subtle shadows, and premium dashboard components that inspire trust.</p>
+                    <div class="concept-tags">
+                        <span class="tag">Instrument Serif</span>
+                        <span class="tag">Navy Palette</span>
+                        <span class="tag">Premium Feel</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="comparison-table">
+            <h2>Design Comparison Matrix</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Primary Color</th>
+                        <th>Theme</th>
+                        <th>Typography</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1. Minimalist Zen</strong></td>
+                        <td><span class="color-swatch" style="background: #b8860b;"></span>#b8860b Gold</td>
+                        <td>Light</td>
+                        <td>Cormorant Garamond + Karla</td>
+                        <td>Design-conscious clients, creative agencies</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2. Bold Expressive</strong></td>
+                        <td><span class="color-swatch" style="background: #e6ff00;"></span>#e6ff00 Neon</td>
+                        <td>Dark</td>
+                        <td>Bebas Neue + Space Mono</td>
+                        <td>Startups, tech companies, standing out</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3. Data-Focused</strong></td>
+                        <td><span class="color-swatch" style="background: #00ff88;"></span>#00ff88 Terminal</td>
+                        <td>Dark</td>
+                        <td>JetBrains Mono + Sora</td>
+                        <td>Technical clients, data-heavy projects</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4. Playful Friendly</strong></td>
+                        <td><span class="color-swatch" style="background: linear-gradient(135deg, #ff6b9d, #c084fc);"></span>Pink-Purple</td>
+                        <td>Light</td>
+                        <td>Nunito + Quicksand</td>
+                        <td>Consumer apps, approachable brands</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5. Enterprise Pro</strong></td>
+                        <td><span class="color-swatch" style="background: #6366f1;"></span>#6366f1 Indigo</td>
+                        <td>Light</td>
+                        <td>Instrument Serif + DM Sans</td>
+                        <td>Enterprise clients, B2B, finance</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <p>Created for Upwork Portfolio Projects by Biswajit</p>
+        </footer>
+    </div>
+</body>
+</html>

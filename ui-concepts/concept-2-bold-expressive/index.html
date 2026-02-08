@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept 2: Bold Expressive - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           CONCEPT 2: BOLD EXPRESSIVE
+           Aesthetic: Neo-brutalism meets retro-futurism
+           Philosophy: "Make it impossible to ignore"
+           ============================================ */
+
+        :root {
+            --neon-yellow: #e6ff00;
+            --electric-blue: #0066ff;
+            --hot-pink: #ff0066;
+            --deep-black: #0a0a0a;
+            --off-white: #f5f5f0;
+            --grid-color: rgba(230, 255, 0, 0.1);
+
+            --font-display: 'Bebas Neue', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        ::selection {
+            background: var(--neon-yellow);
+            color: var(--deep-black);
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background: var(--deep-black);
+            color: var(--off-white);
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        /* Grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== Noise overlay ===== */
+        .noise {
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: overlay;
+        }
+
+        /* ===== Navigation ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--off-white);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.75rem;
+            text-decoration: none;
+            color: var(--off-white);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-yellow);
+        }
+
+        /* ===== Hero Section ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 6rem 3rem;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(5rem, 20vw, 18rem);
+            line-height: 0.85;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .hero h1 .line {
+            display: block;
+            opacity: 0;
+            transform: translateY(100px) skewY(5deg);
+            animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        .hero h1 .line:nth-child(1) { animation-delay: 0.1s; }
+        .hero h1 .line:nth-child(2) { animation-delay: 0.2s; color: var(--neon-yellow); }
+        .hero h1 .line:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0) skewY(0);
+            }
+        }
+
+        .hero-label {
+            position: absolute;
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 1s 0.8s forwards;
+        }
+
+        .hero-label.top-left {
+            top: -40px;
+            left: 0;
+        }
+
+        .hero-label.bottom-right {
+            bottom: -40px;
+            right: 0;
+            color: var(--neon-yellow);
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Floating elements */
+        .float-element {
+            position: absolute;
+            font-family: var(--font-display);
+            font-size: 8rem;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .float-element.one { top: 10%; left: 5%; animation-delay: 0s; }
+        .float-element.two { top: 60%; right: 10%; animation-delay: 2s; }
+        .float-element.three { bottom: 20%; left: 15%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* ===== Projects Section ===== */
+        .projects {
+            padding: 8rem 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 4rem;
+            border-bottom: 2px solid var(--off-white);
+            padding-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 8vw, 6rem);
+            text-transform: uppercase;
+            line-height: 0.9;
+        }
+
+        .section-header .count {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+        }
+
+        /* Project cards - stacked layout */
+        .project-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .project-card {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: 3rem;
+            align-items: center;
+            padding: 3rem;
+            background: var(--deep-black);
+            border: 2px solid var(--off-white);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border: 2px solid var(--neon-yellow);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .project-card:hover {
+            transform: translate(-8px, -8px);
+            background: var(--neon-yellow);
+            color: var(--deep-black);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+            inset: 8px;
+        }
+
+        .project-number {
+            font-family: var(--font-display);
+            font-size: 5rem;
+            line-height: 1;
+        }
+
+        .project-info h3 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-info p {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+
+        .project-tag {
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 0.5rem 1rem;
+            border: 1px solid currentColor;
+        }
+
+        /* ===== App Showcase ===== */
+        .showcase {
+            padding: 8rem 3rem;
+            background: var(--neon-yellow);
+            color: var(--deep-black);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .showcase h2 {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 12vw, 10rem);
+            text-transform: uppercase;
+            line-height: 0.85;
+            margin-bottom: 4rem;
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .showcase-item {
+            background: var(--deep-black);
+            padding: 2rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .showcase-item:hover {
+            transform: rotate(-2deg) scale(1.02);
+        }
+
+        .showcase-item h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--neon-yellow);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .showcase-item p {
+            font-size: 0.8rem;
+            color: var(--off-white);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .showcase-mockup {
+            aspect-ratio: 16/10;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 1px solid rgba(230, 255, 0, 0.3);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mockup-top-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .mockup-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .mockup-dot:nth-child(1) { background: var(--hot-pink); }
+        .mockup-dot:nth-child(2) { background: var(--neon-yellow); }
+        .mockup-dot:nth-child(3) { background: #00ff66; }
+
+        .mockup-content {
+            flex: 1;
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Report Generator mockup */
+        .mockup-report .mockup-content {
+            flex-direction: column;
+        }
+
+        .mockup-upload {
+            flex: 1;
+            border: 2px dashed var(--neon-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--neon-yellow);
+        }
+
+        .mockup-bars {
+            height: 40%;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .mockup-bar {
+            flex: 1;
+            background: var(--electric-blue);
+            animation: barPulse 2s ease-in-out infinite;
+        }
+
+        .mockup-bar:nth-child(1) { height: 60%; animation-delay: 0s; }
+        .mockup-bar:nth-child(2) { height: 80%; animation-delay: 0.2s; }
+        .mockup-bar:nth-child(3) { height: 45%; animation-delay: 0.4s; }
+        .mockup-bar:nth-child(4) { height: 90%; animation-delay: 0.6s; }
+        .mockup-bar:nth-child(5) { height: 70%; animation-delay: 0.8s; }
+
+        @keyframes barPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Document Intelligence mockup */
+        .mockup-doc .mockup-content {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mockup-doc-line {
+            height: 8px;
+            background: rgba(230, 255, 0, 0.2);
+            border-radius: 2px;
+        }
+
+        .mockup-doc-line.highlight {
+            background: var(--hot-pink);
+        }
+
+        .mockup-doc-line:nth-child(3),
+        .mockup-doc-line:nth-child(6) {
+            width: 70%;
+        }
+
+        /* Task Manager mockup */
+        .mockup-kanban .mockup-content {
+            gap: 0.5rem;
+        }
+
+        .mockup-column {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mockup-task {
+            height: 20px;
+            background: rgba(230, 255, 0, 0.3);
+            border-radius: 2px;
+        }
+
+        .mockup-column:nth-child(2) .mockup-task {
+            background: rgba(0, 102, 255, 0.5);
+        }
+
+        .mockup-column:nth-child(3) .mockup-task {
+            background: rgba(0, 255, 102, 0.5);
+        }
+
+        /* ===== CTA Section ===== */
+        .cta {
+            padding: 8rem 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta h2 {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 15vw, 12rem);
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .cta h2 span {
+            display: block;
+        }
+
+        .cta h2 span:nth-child(2) {
+            color: var(--hot-pink);
+            -webkit-text-stroke: 2px var(--hot-pink);
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1.5rem 4rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--deep-black);
+            background: var(--neon-yellow);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 2px solid var(--neon-yellow);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translate(-4px, -4px);
+        }
+
+        .btn:hover::before {
+            inset: 4px;
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            padding: 3rem;
+            border-top: 2px solid var(--off-white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 1024px) {
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-card {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .project-tags {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav, .hero, .projects, .showcase, .cta {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+
+    <nav>
+        <div class="logo">BISWAJIT_</div>
+        <ul class="nav-links">
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#showcase">Showcase</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="float-element one">✦</div>
+        <div class="float-element two">◈</div>
+        <div class="float-element three">▲</div>
+
+        <div class="hero-content">
+            <span class="hero-label top-left">FREELANCE DEVELOPER</span>
+            <h1>
+                <span class="line">BUILD</span>
+                <span class="line">SHIP</span>
+                <span class="line">REPEAT</span>
+            </h1>
+            <span class="hero-label bottom-right">AVAILABLE FOR HIRE_</span>
+        </div>
+    </section>
+
+    <section class="projects" id="projects">
+        <div class="section-header">
+            <h2>Selected<br/>Works</h2>
+            <span class="count">[03] PROJECTS</span>
+        </div>
+
+        <div class="project-stack">
+            <article class="project-card">
+                <div class="project-number">01</div>
+                <div class="project-info">
+                    <h3>Report Generator</h3>
+                    <p>Transform CSV/Excel data into polished PDF reports with AI-powered insights. Automated charts, executive summaries, and beautiful exports.</p>
+                </div>
+                <div class="project-tags">
+                    <span class="project-tag">PYTHON</span>
+                    <span class="project-tag">AI</span>
+                    <span class="project-tag">PDF</span>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-number">02</div>
+                <div class="project-info">
+                    <h3>Document Intelligence</h3>
+                    <p>Advanced document processing with OCR, named entity recognition, AI summarization, and RAG-based conversational Q&A.</p>
+                </div>
+                <div class="project-tags">
+                    <span class="project-tag">NLP</span>
+                    <span class="project-tag">RAG</span>
+                    <span class="project-tag">FASTAPI</span>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-number">03</div>
+                <div class="project-info">
+                    <h3>TaskFlow Manager</h3>
+                    <p>Full-stack task management with real-time Kanban boards, drag-drop functionality, and enterprise-grade authentication.</p>
+                </div>
+                <div class="project-tags">
+                    <span class="project-tag">NEXT.JS</span>
+                    <span class="project-tag">CONVEX</span>
+                    <span class="project-tag">WORKOS</span>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="showcase" id="showcase">
+        <h2>In<br/>Action</h2>
+
+        <div class="showcase-grid">
+            <div class="showcase-item">
+                <h3>Report Generator</h3>
+                <p>Upload your data, select a template, and let AI generate insights automatically.</p>
+                <div class="showcase-mockup mockup-report">
+                    <div class="mockup-top-bar">
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                    </div>
+                    <div class="mockup-content">
+                        <div class="mockup-upload">↑ DROP CSV HERE</div>
+                        <div class="mockup-bars">
+                            <div class="mockup-bar"></div>
+                            <div class="mockup-bar"></div>
+                            <div class="mockup-bar"></div>
+                            <div class="mockup-bar"></div>
+                            <div class="mockup-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="showcase-item">
+                <h3>Document Intelligence</h3>
+                <p>Extract entities, generate summaries, and ask questions about your documents.</p>
+                <div class="showcase-mockup mockup-doc">
+                    <div class="mockup-top-bar">
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                    </div>
+                    <div class="mockup-content">
+                        <div class="mockup-doc-line"></div>
+                        <div class="mockup-doc-line"></div>
+                        <div class="mockup-doc-line highlight"></div>
+                        <div class="mockup-doc-line"></div>
+                        <div class="mockup-doc-line highlight"></div>
+                        <div class="mockup-doc-line"></div>
+                        <div class="mockup-doc-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="showcase-item">
+                <h3>TaskFlow Manager</h3>
+                <p>Drag and drop tasks across columns. Real-time sync keeps everyone updated.</p>
+                <div class="showcase-mockup mockup-kanban">
+                    <div class="mockup-top-bar">
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                        <div class="mockup-dot"></div>
+                    </div>
+                    <div class="mockup-content">
+                        <div class="mockup-column">
+                            <div class="mockup-task"></div>
+                            <div class="mockup-task"></div>
+                            <div class="mockup-task"></div>
+                        </div>
+                        <div class="mockup-column">
+                            <div class="mockup-task"></div>
+                            <div class="mockup-task"></div>
+                        </div>
+                        <div class="mockup-column">
+                            <div class="mockup-task"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="contact">
+        <h2>
+            <span>LET'S</span>
+            <span>WORK</span>
+        </h2>
+        <a href="mailto:hello@biswajit.dev" class="btn">Start a Project →</a>
+    </section>
+
+    <footer>
+        <span>© 2024 BISWAJIT</span>
+        <span>UPWORK PORTFOLIO_</span>
+    </footer>
+</body>
+</html>

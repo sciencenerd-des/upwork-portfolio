@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Iteration Index</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #f2f4f8;
+      --ink: #111827;
+      --muted: #4b5563;
+      --line: #d2d7e2;
+      --card: #ffffff;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Manrope", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 5%, rgba(255, 155, 117, 0.24), transparent 34%),
+        radial-gradient(circle at 92% 8%, rgba(53, 124, 255, 0.2), transparent 32%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .shell {
+      width: min(1140px, calc(100% - 32px));
+      margin: 28px auto 48px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(6px);
+      padding: 24px;
+      box-shadow: 0 16px 34px rgba(17, 24, 39, 0.08);
+      margin-bottom: 16px;
+    }
+
+    .kicker {
+      margin: 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #51607a;
+    }
+
+    h1 {
+      margin: 8px 0 0;
+      font-family: "Archivo Black", sans-serif;
+      letter-spacing: 0.01em;
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: 0.96;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 65ch;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      padding: 16px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 10px 20px rgba(17, 24, 39, 0.06);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: auto auto -100px -100px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .card:nth-child(1)::after { background: radial-gradient(circle, #ff8d62, transparent 68%); }
+    .card:nth-child(2)::after { background: radial-gradient(circle, #d68f45, transparent 70%); }
+    .card:nth-child(3)::after { background: radial-gradient(circle, #56c6b2, transparent 68%); }
+    .card:nth-child(4)::after { background: radial-gradient(circle, #48a1e1, transparent 68%); }
+    .card:nth-child(5)::after { background: radial-gradient(circle, #ff4a58, transparent 68%); }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 28px rgba(17, 24, 39, 0.12);
+      border-color: #a8b3c8;
+    }
+
+    .card:focus-visible {
+      outline: 4px solid rgba(53, 124, 255, 0.28);
+      outline-offset: 2px;
+    }
+
+    .id {
+      display: inline-block;
+      margin-bottom: 8px;
+      border: 1px solid #c7cfdd;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+      max-width: 44ch;
+    }
+
+    .meta {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      border: 1px solid #c7cfdd;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      background: #f8fafc;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="kicker">UI Exploration Set</p>
+      <h1>Five intentionally different interface directions.</h1>
+      <p>Each version explores a distinct visual system for the same cross-product workflow surface. Open any concept to review responsive behavior, interaction states, and product modules.</p>
+    </section>
+
+    <section class="grid">
+      <a class="card" href="version-1-solar-orbit.html">
+        <span class="id">Version 1</span>
+        <h2>Solar Orbit</h2>
+        <p>Warm cockpit aesthetic with orbital telemetry and soft glass panels.</p>
+        <div class="meta"><span class="tag">Light</span><span class="tag">Atmospheric</span><span class="tag">Signal color</span></div>
+      </a>
+
+      <a class="card" href="version-2-editorial-grid.html">
+        <span class="id">Version 2</span>
+        <h2>Editorial Grid</h2>
+        <p>Newspaper-style hierarchy focused on scan speed and strict linework.</p>
+        <div class="meta"><span class="tag">Typography-led</span><span class="tag">Hard grid</span><span class="tag">Information dense</span></div>
+      </a>
+
+      <a class="card" href="version-3-coastal-cards.html">
+        <span class="id">Version 3</span>
+        <h2>Coastal Cards</h2>
+        <p>Fluid, calm layout with rounded modules and soft wave motion accents.</p>
+        <div class="meta"><span class="tag">Approachable</span><span class="tag">Soft geometry</span><span class="tag">Glass layers</span></div>
+      </a>
+
+      <a class="card" href="version-4-midnight-terminal.html">
+        <span class="id">Version 4</span>
+        <h2>Midnight Terminal</h2>
+        <p>Compact dark operations UI with command semantics and CRT texture.</p>
+        <div class="meta"><span class="tag">Power users</span><span class="tag">Dense</span><span class="tag">Terminal cues</span></div>
+      </a>
+
+      <a class="card" href="version-5-brutalist-ops.html">
+        <span class="id">Version 5</span>
+        <h2>Brutalist Ops</h2>
+        <p>Poster-like, high-contrast interface with aggressive blocks and labels.</p>
+        <div class="meta"><span class="tag">Bold</span><span class="tag">Asymmetric</span><span class="tag">High energy</span></div>
+      </a>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Iteration 4 - Midnight Terminal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700&family=Source+Code+Pro:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #050d15;
+      --panel: #0b1724;
+      --panel-2: #0f2132;
+      --line: #1f3c52;
+      --ink: #d3eaff;
+      --muted: #7da1bf;
+      --cyan: #00c8b8;
+      --amber: #ffb347;
+      --danger: #ff6565;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Oxanium", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 14% 6%, #14314a 0, transparent 32%),
+        radial-gradient(circle at 92% 8%, #102a3f 0, transparent 28%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.03) 0,
+        rgba(255, 255, 255, 0.03) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: screen;
+      opacity: 0.3;
+      animation: scan 7s linear infinite;
+    }
+
+    .terminal {
+      width: min(1240px, calc(100% - 28px));
+      margin: 18px auto 38px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
+      background: linear-gradient(180deg, #071220 0%, #08101a 100%);
+    }
+
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: rgba(4, 13, 22, 0.88);
+    }
+
+    .lights {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .lights span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 10px rgba(255, 101, 101, 0.5);
+    }
+
+    .lights span:nth-child(2) {
+      background: var(--amber);
+      box-shadow: 0 0 10px rgba(255, 179, 71, 0.45);
+    }
+
+    .lights span:nth-child(3) {
+      background: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 200, 184, 0.45);
+    }
+
+    .mono {
+      font-family: "Source Code Pro", monospace;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      padding: 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(165deg, rgba(11, 23, 36, 0.9), rgba(8, 17, 27, 0.9));
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(31px, 4.8vw, 60px);
+      line-height: 0.92;
+      max-width: 12ch;
+      letter-spacing: 0.01em;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      color: #99b9d3;
+      max-width: 64ch;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .cmd {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #050f19;
+      padding: 10px;
+      font: 500 12px "Source Code Pro", monospace;
+      color: #a8c6de;
+      display: grid;
+      gap: 5px;
+    }
+
+    .cmd b {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .grid {
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .module {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      padding: 12px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .module:hover {
+      transform: translateY(-2px);
+      border-color: #2b5877;
+    }
+
+    .module h2 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .tag {
+      font: 600 10px "Source Code Pro", monospace;
+      padding: 3px 6px;
+      border: 1px solid #2d5978;
+      border-radius: 999px;
+      color: #9ec1df;
+      white-space: nowrap;
+    }
+
+    .report {
+      grid-column: span 5;
+    }
+
+    .doc {
+      grid-column: span 4;
+    }
+
+    .tasks {
+      grid-column: span 3;
+    }
+
+    .log {
+      grid-column: span 8;
+    }
+
+    .status {
+      grid-column: span 4;
+    }
+
+    .steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .step {
+      font: 500 11px "Source Code Pro", monospace;
+      border: 1px solid #2d5978;
+      border-radius: 999px;
+      padding: 5px 8px;
+      color: #9ec1df;
+      background: rgba(0, 0, 0, 0.14);
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font: 500 11px "Source Code Pro", monospace;
+      color: #99b9d3;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    select,
+    button,
+    input {
+      border: 1px solid #2d5978;
+      border-radius: 10px;
+      background: #04111d;
+      color: #d3eaff;
+      padding: 9px;
+      font: 500 12px "Source Code Pro", monospace;
+      width: 100%;
+    }
+
+    select:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(0, 200, 184, 0.2);
+      border-color: var(--cyan);
+    }
+
+    .cta-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    button.primary {
+      background: linear-gradient(120deg, #009e93, #00c8b8);
+      border-color: transparent;
+      color: #00181b;
+      font-weight: 700;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .warning {
+      margin-top: 10px;
+      border-left: 4px solid var(--danger);
+      background: rgba(255, 101, 101, 0.14);
+      color: #ffd2d2;
+      padding: 8px;
+      border-radius: 8px;
+      font: 500 11px "Source Code Pro", monospace;
+    }
+
+    .fact {
+      border: 1px solid #2a4f69;
+      border-radius: 8px;
+      padding: 8px;
+      font: 500 12px "Source Code Pro", monospace;
+      margin-bottom: 8px;
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .board {
+      display: grid;
+      gap: 8px;
+    }
+
+    .lane {
+      border: 1px dashed #2f5876;
+      border-radius: 8px;
+      padding: 7px;
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .lane b {
+      display: block;
+      font: 600 10px "Source Code Pro", monospace;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #9ec1df;
+      letter-spacing: 0.07em;
+    }
+
+    .item {
+      border-left: 3px solid var(--amber);
+      padding: 6px;
+      border-radius: 7px;
+      background: #041626;
+      font: 500 11px "Source Code Pro", monospace;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 7px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 10px;
+      align-items: start;
+      font: 500 11px "Source Code Pro", monospace;
+      color: #b7d2e6;
+    }
+
+    .event time {
+      color: #79a0be;
+    }
+
+    .event div {
+      border: 1px solid #2a4f69;
+      border-radius: 8px;
+      padding: 7px;
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .status-tile {
+      border: 1px solid #2d5978;
+      border-radius: 10px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.16);
+    }
+
+    .status-tile small {
+      font: 600 10px "Source Code Pro", monospace;
+      letter-spacing: 0.07em;
+      color: #8db1cc;
+      text-transform: uppercase;
+    }
+
+    .status-tile strong {
+      display: block;
+      font-size: 23px;
+      margin-top: 3px;
+      line-height: 1;
+    }
+
+    @keyframes scan {
+      from {
+        transform: translateY(-4px);
+      }
+
+      to {
+        transform: translateY(4px);
+      }
+    }
+
+    @media (max-width: 1000px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .report,
+      .doc,
+      .tasks,
+      .log,
+      .status {
+        grid-column: 1 / -1;
+      }
+
+      .cta-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="terminal">
+    <header class="topbar">
+      <div class="lights" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="mono">iteration_04.midnight_terminal :: secure_session</div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <h1>Command-grade UX for operators.</h1>
+        <p>Midnight Terminal compresses controls, events, and system health into a scan-friendly dark shell tuned for keyboard-centric workflows.</p>
+      </div>
+      <div class="cmd">
+        <div><b>$</b> reportctl run --profile nightly</div>
+        <div><b>$</b> docintel extract --source /invoices</div>
+        <div><b>$</b> taskflow board --compact</div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="module report">
+        <h2>Automated Report Generator <span class="tag">Config</span></h2>
+        <div class="steps">
+          <span class="step">INGEST</span>
+          <span class="step">MAP</span>
+          <span class="step">SYNTHESIZE</span>
+          <span class="step">EXPORT</span>
+        </div>
+        <div class="field">
+          <label for="mode">missing_value_strategy</label>
+          <select id="mode" name="mode">
+            <option>keep_as_is</option>
+            <option>drop_rows</option>
+            <option>fill_zero</option>
+            <option>fill_mean</option>
+            <option>forward_fill</option>
+          </select>
+        </div>
+        <div class="cta-row">
+          <button class="primary" type="button">Run pipeline</button>
+          <button type="button">Dry run only</button>
+        </div>
+        <div class="warning">ALERT: AI route unavailable 2 times in last 24h. fallback_narrative=true</div>
+      </article>
+
+      <article class="module doc">
+        <h2>Document Intelligence <span class="tag">NER</span></h2>
+        <div class="fact">invoice_id=INV-99312</div>
+        <div class="fact">amount_usd=15490.25</div>
+        <div class="fact">due_date=2026-03-09</div>
+        <div class="fact">citation_pages=[1,2,6]</div>
+      </article>
+
+      <article class="module tasks">
+        <h2>Task Manager <span class="tag">Kanban</span></h2>
+        <div class="board">
+          <div class="lane"><b>Todo</b><div class="item">Audit reduced motion behavior</div></div>
+          <div class="lane"><b>Doing</b><div class="item">Patch drag ghost jitter</div></div>
+          <div class="lane"><b>Done</b><div class="item">Ship keyboard quick-actions</div></div>
+        </div>
+      </article>
+
+      <article class="module log">
+        <h2>Execution Timeline <span class="tag">Live feed</span></h2>
+        <div class="timeline">
+          <div class="event"><time>14:06:09</time><div>batch_run_447 started with 12 sources</div></div>
+          <div class="event"><time>14:06:53</time><div>entity extraction completed (confidence 0.93)</div></div>
+          <div class="event"><time>14:07:14</time><div>fallback narrative injected for section KPI-3</div></div>
+          <div class="event"><time>14:07:28</time><div>kanban sync posted to project board alpha</div></div>
+        </div>
+      </article>
+
+      <article class="module status">
+        <h2>System Status <span class="tag">Now</span></h2>
+        <div class="status-grid">
+          <div class="status-tile"><small>Pipeline latency</small><strong>2.1s</strong></div>
+          <div class="status-tile"><small>Document queue</small><strong>39</strong></div>
+          <div class="status-tile"><small>Task throughput</small><strong>+22%</strong></div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

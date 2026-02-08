@@ -554,19 +554,26 @@ nav {
 .demo-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  border: 1px solid rgba(76, 95, 233, 0.34);
-  background: rgba(76, 95, 233, 0.08);
-  color: var(--indigo);
+  gap: 0.4rem;
+  border: 1px solid rgba(76, 95, 233, 0.25);
+  background: linear-gradient(135deg, rgba(76, 95, 233, 0.08), rgba(242, 169, 107, 0.08));
+  color: var(--navy);
   border-radius: 999px;
-  padding: 0.3rem 0.58rem;
-  font-size: 0.78rem;
-  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 200ms ease;
+}
+
+.demo-badge:hover {
+  border-color: rgba(76, 95, 233, 0.4);
+  background: linear-gradient(135deg, rgba(76, 95, 233, 0.12), rgba(242, 169, 107, 0.12));
 }
 
 .demo-badge.compact {
-  font-size: 0.72rem;
-  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
 }
 
 .info-card {
@@ -610,6 +617,20 @@ nav {
 
 .h-\[420px\] {
   height: 420px;
+}
+
+.landing-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.landing-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
 }
 
 .animate-fade-in {

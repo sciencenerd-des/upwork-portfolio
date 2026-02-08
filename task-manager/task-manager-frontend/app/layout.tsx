@@ -15,8 +15,8 @@ const headingFont = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Task Manager",
-  description: "Notion-level polish for modern task management with a demo-friendly mode."
+  title: "Northstar PM - Enterprise Project Management",
+  description: "Project management that balances structure with speed. Built for teams that need accountability without bureaucracy."
 };
 
 export default function RootLayout({

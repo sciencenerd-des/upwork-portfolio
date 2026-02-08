@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept 5: Enterprise Professional - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           CONCEPT 5: ENTERPRISE PROFESSIONAL
+           Aesthetic: Stripe meets Linear - sophisticated tech
+           Philosophy: "Confidence through restraint"
+           ============================================ */
+
+        :root {
+            --navy-900: #0f172a;
+            --navy-800: #1e293b;
+            --navy-700: #334155;
+            --navy-600: #475569;
+            --navy-500: #64748b;
+            --navy-400: #94a3b8;
+            --navy-300: #cbd5e1;
+            --navy-200: #e2e8f0;
+            --navy-100: #f1f5f9;
+            --navy-50: #f8fafc;
+
+            --accent-indigo: #6366f1;
+            --accent-indigo-light: #818cf8;
+            --accent-violet: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+
+            --gradient-premium: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --gradient-subtle: linear-gradient(180deg, var(--navy-50) 0%, #ffffff 100%);
+
+            --font-display: 'Instrument Serif', serif;
+            --font-body: 'DM Sans', sans-serif;
+
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.12);
+            --shadow-xl: 0 24px 60px rgba(15, 23, 42, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--navy-50);
+            color: var(--navy-800);
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== Navigation ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--navy-200);
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--navy-900);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-premium);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-mark svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--navy-600);
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--navy-900);
+        }
+
+        .nav-cta {
+            padding: 0.6rem 1.25rem;
+            background: var(--navy-900);
+            color: white !important;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--navy-800);
+            transform: translateY(-1px);
+        }
+
+        /* ===== Hero Section ===== */
+        .hero {
+            padding: 10rem 4rem 6rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-content {
+            max-width: 560px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-indigo);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent-emerald);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 400;
+            line-height: 1.15;
+            color: var(--navy-900);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--accent-indigo);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--navy-600);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--navy-900);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--navy-800);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--navy-700);
+            border: 1px solid var(--navy-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--navy-100);
+            border-color: var(--navy-400);
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+        }
+
+        .hero-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            border: 1px solid var(--navy-200);
+        }
+
+        .hero-card-header {
+            padding: 1rem 1.5rem;
+            background: var(--navy-50);
+            border-bottom: 1px solid var(--navy-200);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .window-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--navy-300);
+        }
+
+        .window-dot:nth-child(1) { background: #ff5f57; }
+        .window-dot:nth-child(2) { background: #febc2e; }
+        .window-dot:nth-child(3) { background: #28c840; }
+
+        .hero-card-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--navy-600);
+            flex: 1;
+            text-align: center;
+        }
+
+        .hero-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Stats row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--navy-50);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--navy-900);
+        }
+
+        .stat-value.highlight { color: var(--accent-indigo); }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--navy-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+
+        /* Mini chart */
+        .mini-chart {
+            background: var(--navy-50);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--navy-700);
+        }
+
+        .chart-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-emerald);
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--gradient-premium);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+
+        .chart-bar:nth-child(1) { height: 40%; }
+        .chart-bar:nth-child(2) { height: 65%; }
+        .chart-bar:nth-child(3) { height: 45%; }
+        .chart-bar:nth-child(4) { height: 80%; }
+        .chart-bar:nth-child(5) { height: 60%; }
+        .chart-bar:nth-child(6) { height: 90%; }
+        .chart-bar:nth-child(7) { height: 75%; }
+
+        /* Floating badges */
+        .floating-badge {
+            position: absolute;
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .floating-badge.top-left {
+            top: -20px;
+            left: -40px;
+        }
+
+        .floating-badge.bottom-right {
+            bottom: 40px;
+            right: -30px;
+        }
+
+        .badge-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .badge-icon.green { background: rgba(16, 185, 129, 0.15); }
+        .badge-icon.purple { background: rgba(139, 92, 246, 0.15); }
+
+        /* ===== Projects Section ===== */
+        .projects {
+            padding: 6rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--navy-900);
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+            color: var(--navy-500);
+            margin-top: 0.5rem;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--navy-200);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--navy-300);
+        }
+
+        .project-preview {
+            height: 180px;
+            background: var(--navy-100);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-preview::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-subtle);
+            opacity: 0.5;
+        }
+
+        .preview-icon {
+            font-size: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .project-content {
+            padding: 1.5rem;
+        }
+
+        .project-category {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-indigo);
+            margin-bottom: 0.5rem;
+        }
+
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--navy-900);
+            margin-bottom: 0.75rem;
+        }
+
+        .project-desc {
+            font-size: 0.9rem;
+            color: var(--navy-600);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--navy-200);
+        }
+
+        .meta-item {
+            font-size: 0.8rem;
+            color: var(--navy-500);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* ===== Capabilities Section ===== */
+        .capabilities {
+            padding: 6rem 4rem;
+            background: var(--navy-900);
+            color: white;
+        }
+
+        .capabilities .section-title {
+            color: white;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .capability-card {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .capability-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .capability-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-premium);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .capability-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .capability-card p {
+            font-size: 0.85rem;
+            color: var(--navy-400);
+            line-height: 1.6;
+        }
+
+        /* ===== CTA Section ===== */
+        .cta {
+            padding: 6rem 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--navy-900);
+            margin-bottom: 1rem;
+        }
+
+        .cta p {
+            font-size: 1.1rem;
+            color: var(--navy-600);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            padding: 3rem 4rem;
+            border-top: 1px solid var(--navy-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            font-size: 0.9rem;
+            color: var(--navy-500);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--navy-700);
+        }
+
+        .footer-copy {
+            font-size: 0.85rem;
+            color: var(--navy-400);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 1200px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-visual {
+                display: none;
+            }
+
+            .capabilities-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav, .hero, .projects, .capabilities, .cta, footer {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span>Biswajit</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#capabilities">Capabilities</a></li>
+            <li><a href="#contact">About</a></li>
+            <li><a href="mailto:hello@biswajit.dev" class="nav-cta">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">Available for projects</div>
+            <h1>Engineering <em>thoughtful</em> software solutions</h1>
+            <p>I build production-grade applications that combine robust backend systems with polished user experiences. From data processing pipelines to real-time collaboration tools.</p>
+            <div class="hero-actions">
+                <a href="#projects" class="btn btn-primary">
+                    View Projects
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="floating-badge top-left">
+                <div class="badge-icon green">✓</div>
+                <span>97% Test Coverage</span>
+            </div>
+
+            <div class="hero-card">
+                <div class="hero-card-header">
+                    <div class="window-dots">
+                        <div class="window-dot"></div>
+                        <div class="window-dot"></div>
+                        <div class="window-dot"></div>
+                    </div>
+                    <span class="hero-card-title">Portfolio Dashboard</span>
+                </div>
+                <div class="hero-card-body">
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value highlight">15K+</div>
+                            <div class="stat-label">Lines</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Technologies</div>
+                        </div>
+                    </div>
+                    <div class="mini-chart">
+                        <div class="chart-header">
+                            <span class="chart-title">Commit Activity</span>
+                            <span class="chart-badge">+23%</span>
+                        </div>
+                        <div class="chart-bars">
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="floating-badge bottom-right">
+                <div class="badge-icon purple">⚡</div>
+                <span>&lt;200ms Response</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="projects" id="projects">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Featured Projects</h2>
+                <p class="section-subtitle">Production-ready applications built with modern technologies</p>
+            </div>
+        </div>
+
+        <div class="projects-grid">
+            <article class="project-card">
+                <div class="project-preview">
+                    <span class="preview-icon">📊</span>
+                </div>
+                <div class="project-content">
+                    <span class="project-category">Data Processing</span>
+                    <h3 class="project-title">Automated Report Generator</h3>
+                    <p class="project-desc">Transform CSV/Excel data into professional PDF reports with AI-generated insights and visualizations.</p>
+                    <div class="project-meta">
+                        <span class="meta-item">🐍 Python</span>
+                        <span class="meta-item">🤖 OpenAI</span>
+                        <span class="meta-item">📄 PDF</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-preview">
+                    <span class="preview-icon">🔍</span>
+                </div>
+                <div class="project-content">
+                    <span class="project-category">AI/ML</span>
+                    <h3 class="project-title">Document Intelligence</h3>
+                    <p class="project-desc">Advanced document processing with OCR, entity extraction, summarization, and RAG-based Q&A capabilities.</p>
+                    <div class="project-meta">
+                        <span class="meta-item">⚡ FastAPI</span>
+                        <span class="meta-item">🧠 NLP</span>
+                        <span class="meta-item">🔗 RAG</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-preview">
+                    <span class="preview-icon">✅</span>
+                </div>
+                <div class="project-content">
+                    <span class="project-category">Full Stack</span>
+                    <h3 class="project-title">TaskFlow Manager</h3>
+                    <p class="project-desc">Real-time task management with Kanban boards, drag-drop functionality, and enterprise authentication.</p>
+                    <div class="project-meta">
+                        <span class="meta-item">⚛️ Next.js</span>
+                        <span class="meta-item">🔄 Convex</span>
+                        <span class="meta-item">🔐 WorkOS</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="capabilities" id="capabilities">
+        <h2 class="section-title">Technical Capabilities</h2>
+
+        <div class="capabilities-grid">
+            <div class="capability-card">
+                <div class="capability-icon">🏗️</div>
+                <h4>Architecture</h4>
+                <p>Clean, modular code with separation of concerns and comprehensive test coverage.</p>
+            </div>
+            <div class="capability-card">
+                <div class="capability-icon">🤖</div>
+                <h4>AI Integration</h4>
+                <p>LLM APIs, RAG systems, NLP pipelines, and intelligent automation workflows.</p>
+            </div>
+            <div class="capability-card">
+                <div class="capability-icon">⚡</div>
+                <h4>Performance</h4>
+                <p>Optimized APIs with sub-200ms response times and efficient database queries.</p>
+            </div>
+            <div class="capability-card">
+                <div class="capability-icon">🔐</div>
+                <h4>Security</h4>
+                <p>Enterprise-grade authentication, input validation, and secure data handling.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="contact">
+        <h2>Ready to discuss your project?</h2>
+        <p>I'm currently available for freelance projects. Let's explore how we can work together to build something exceptional.</p>
+        <a href="mailto:hello@biswajit.dev" class="btn btn-primary">
+            Start a Conversation
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+    </section>
+
+    <footer>
+        <div class="footer-left">
+            <div class="logo">
+                <div class="logo-mark" style="width: 24px; height: 24px;">
+                    <svg viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <span style="font-size: 1rem;">Biswajit</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">GitHub</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">Upwork</a>
+            </div>
+        </div>
+        <span class="footer-copy">© 2024 Biswajit. All rights reserved.</span>
+    </footer>
+</body>
+</html>
