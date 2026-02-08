@@ -383,10 +383,10 @@ def render_step_2_configure() -> None:
 
         with opt_col2:
             format_options = st.multiselect(
-                "Output Formats",
+                "Export Formats",
                 ["pdf", "docx"],
                 default=st.session_state.output_formats,
-                help="Select one or more output formats.",
+                help="Choose your preferred export formats for distribution.",
             )
             st.session_state.output_formats = format_options if format_options else ["pdf"]
 
