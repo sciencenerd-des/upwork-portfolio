@@ -9,7 +9,7 @@ Three production-ready portfolio projects demonstrating full-stack development, 
 | Project | Platform | Status | Live URL |
 |---------|----------|--------|----------|
 | **Automated Report Generator** | Streamlit Cloud | ✅ **LIVE** | https://sciencenerd-des-upwork-por-automated-report-generatorapp-vuwedn.streamlit.app |
-| **Document Intelligence** | Render | 🟡 Deploying | [Deploy API](https://render.com/deploy?repo=https://github.com/sciencenerd-des/upwork-portfolio) |
+| **Document Intelligence** | Render | ✅ **LIVE** | https://upwork-portfolio-gx4d.onrender.com |
 | **Task Manager** | Vercel | ✅ **LIVE** | [https://task-manager-frontend-lvabx3u4j.vercel.app](https://task-manager-frontend-lvabx3u4j.vercel.app) |
 
 ---

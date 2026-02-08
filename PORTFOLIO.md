@@ -29,8 +29,8 @@
 ---
 
 ### 2. Document Intelligence System  
-**Live API:** https://document-intelligence-api.onrender.com *(Deploying...)*  
-**Live UI:** https://document-intelligence-ui.streamlit.app *(Deploying...)*
+**Live API:** https://upwork-portfolio-gx4d.onrender.com ✅  
+**API Docs:** https://upwork-portfolio-gx4d.onrender.com/docs
 
 **The Problem:** Manual data entry from invoices, contracts, and scanned documents costs hours per day
 

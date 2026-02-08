@@ -3,9 +3,9 @@
 ## Live Demo Status
 | Project | Target Platform | Live Demo URL | Deployment Status | Notes |
 | --- | --- | --- | --- | --- |
-| Automated Report Generator | Streamlit Cloud | [Streamlit Cloud URL - TBD] | Pending | Configure app secrets and data upload limits |
-| Document Intelligence System | Render | [Render URL - TBD] | Pending | Validate OCR dependencies and storage mount |
-| Task Management System | Vercel | [Vercel URL - TBD] | Pending | Set Convex + WorkOS environment variables |
+| Automated Report Generator | Streamlit Cloud | https://sciencenerd-des-upwork-por-automated-report-generatorapp-vuwedn.streamlit.app | ✅ LIVE | AI insights optional, max 10MB uploads |
+| Document Intelligence System | Render | https://upwork-portfolio-gx4d.onrender.com | ✅ LIVE | OCR + entity extraction + Q&A API |
+| Task Management System | Vercel | https://task-manager-frontend-e92ka6kzu.vercel.app | ✅ LIVE | Demo mode active, sample data pre-loaded |
 
 ## Screenshots Checklist
 - [x] Portfolio banner image (`assets/portfolio-banner.png`)
