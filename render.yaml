@@ -1,0 +1,28 @@
+# Render Blueprint for Document Intelligence System
+# Deploy to Render using this configuration
+
+services:
+  - type: web
+    name: document-intelligence-api
+    runtime: docker
+    rootDir: document-intelligence
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false  # Set this in Render dashboard
+      - key: DI_API_KEY
+        generateValue: true
+      - key: MAX_UPLOAD_MB
+        value: 50
+    healthCheckPath: /health
+    autoDeploy: true
+
+# Optional: Deploy Streamlit UI as separate service
+  - type: web
+    name: document-intelligence-ui
+    runtime: docker
+    rootDir: document-intelligence
+    dockerCommand: streamlit run app/streamlit_app.py --server.port $PORT
+    envVars:
+      - key: API_BASE_URL
+        value: https://document-intelligence-api.onrender.com
