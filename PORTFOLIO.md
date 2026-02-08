@@ -8,7 +8,7 @@
 ## 🚀 Featured Projects
 
 ### 1. Automated Report Generator
-**Live Demo:** https://automated-report-generator.streamlit.app *(Deploying...)*
+**Live Demo:** https://sciencenerd-des-upwork-por-automated-report-generatorapp-vuwedn.streamlit.app ✅
 
 **The Problem:** Finance teams spend 4+ hours manually creating weekly reports in Excel
 
