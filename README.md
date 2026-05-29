@@ -4,13 +4,17 @@ Three production-ready portfolio projects demonstrating full-stack development, 
 
 ---
 
-## 🚀 Live Demos
+## 🚀 Projects & deployment
 
-| Project | Platform | Status | Live URL |
-|---------|----------|--------|----------|
-| **Automated Report Generator** | Streamlit Cloud | ✅ **LIVE** | https://sciencenerd-des-upwork-por-automated-report-generatorapp-vuwedn.streamlit.app |
-| **Document Intelligence** | Render | ✅ **LIVE** | https://upwork-portfolio-gx4d.onrender.com |
-| **Task Manager** | Vercel | ✅ **LIVE** | [https://task-manager-frontend-lvabx3u4j.vercel.app](https://task-manager-frontend-lvabx3u4j.vercel.app) |
+Each project below is one-click deployable (see its deploy button) and runs
+locally in a single command. Hosted demos run on free tiers and may be asleep —
+the deploy buttons spin up a fresh instance in minutes.
+
+| Project | Stack | Deploy | Run locally |
+|---------|-------|--------|-------------|
+| **Automated Report Generator** | Python · Streamlit | Streamlit Cloud (button below) | `cd automated-report-generator && streamlit run app.py` |
+| **Document Intelligence** | Python · FastAPI | Render (button below) | see project README |
+| **Task Manager** | Next.js | Vercel (button below) | see project README |
 
 ---
 
